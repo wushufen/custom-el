@@ -1,11 +1,14 @@
 <html>
   <head>
     <script type="module">
-      import './TodoList.js'
+      import { TodoList } from './TodoList.js'
+      TodoList.defineCustomElement('x-todo-list')
     </script>
   </head>
   <body>
     <x-component attr="attr">x</x-component>
     <x-todo-list></x-todo-list>
+
+    <x-todo message="ok">x</x-todo>
   </body>
 </html>

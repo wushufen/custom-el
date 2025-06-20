@@ -1,82 +1,12 @@
-/**
- * @typedef {string|HTMLElement|typeof HTMLElement} Tag
- * @typedef {Tag|string|number|boolean|null|undefined} Child
- * @param {Tag} tag
- * @param {object} attrs
- * @param {Child|(Child)[]} children
- * @returns
- */
-export function h(tag = '', attrs = {}, children = []) {
-  if (!(children instanceof Array)) children = [children]
-
-  let el
-  // tag
-  {
-    // 'tagName'
-    if (typeof tag === 'string') {
-      el = document.createElement(tag)
-    }
-    // HTMLElement
-    else if (tag instanceof HTMLElement) {
-      el = tag
-    }
-    // Custom Element
-    else if (tag.prototype instanceof HTMLElement) {
-      let name = customElements.getName(tag)
-      if (!name) {
-        name = `x-${tag.name.toLowerCase()}`
-        customElements.define(name, tag)
-      }
-      el = document.createElement(name)
-    }
-    // Unknown
-    else {
-      el = document.createElement('unknown')
-    }
-  }
-
-  // attrs
-  for (const key of Object.keys(attrs)) {
-    if (key === 'class') {
-      for (const className of Object.keys(attrs.class)) {
-        el.classList.add(className)
-      }
-      continue
-    }
-
-    if (key === 'style') {
-      for (const styleName of Object.keys(attrs.style)) {
-        el.style[styleName] = attrs.style[styleName]
-      }
-      continue
-    }
-
-    // props
-    // console.log(el, key, attrs[key])
-    el[key] = attrs[key]
-  }
-
-  // children
-  for (const child of children) {
-    if (child instanceof Node) {
-      el.appendChild(child)
-    } else {
-      const text = document.createTextNode(String(child ?? ''))
-      el.appendChild(text)
-    }
-  }
-
-  // el.toString = () => `<${el.localName}></${el.localName}>`
-  return el
-}
+import { h } from './h.js'
 
 export function defineElement(name) {
   /**
-   * @param {object} attrs
-   * @param {Child|(Child)[]} children
+   * @param {Props} props
+   * @param {Children} children
    */
-  return function element(attrs = {}, children = []) {
-    return h(name, attrs, children)
+  return function element(props = {}, children = []) {
+    return h(name, props, children)
   }
 }
 
