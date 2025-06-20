@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Web Component 示例</title>
+    <script type="module">
+      import './src/index.js'
+    </script>
+  </head>
+  <body>
+    <w-custom></w-custom>
+    <w-console></w-console>
+
+    <template>
+      <w-button>button</w-button>
+
+      <w-input></w-input>
+
+      <w-input-group>
+        <w-input></w-input>
+        <w-button>Q</w-button>
+      </w-input-group>
+
+      <w-textarea></w-textarea>
+
+      <w-select>
+        <option value="1">1</option>
+        <option value="2">2</option>
+      </w-select>
+
+      <w-tooltip>tooltip</w-tooltip>
+
+      <w-toast>toast</w-toast>
+
+      <w-input type="checkbox"></w-input>
+      <w-input type="radio"></w-input>
+      <w-input type="range"></w-input>
+      <w-input type="checkbox" is="w-switch"></w-input>
+      <w-input type="date"></w-input>
+      <w-switch></w-switch>
+      <w-textarea is="w-code-editor"></w-textarea>
+
+      <w-button-group>
+        <w-button>button</w-button>
+        <w-button is="w-goto-top">button</w-button>
+        <w-button is="w-fullscreen">button</w-button>
+      </w-button-group>
+
+      <w-tooltip>[title=tooltip]</w-tooltip>
+
+      <w-table>
+        <tr>
+          <td></td>
+        </tr>
+      </w-table>
+      <w-pager></w-pager>
+
+      <w-tree>
+        <template>
+          <div></div>
+        </template>
+      </w-tree>
+
+      <w-button>button</w-button>
+
+      <ul is="virtual-list" .data="data" @change="index = this.value">
+        <li v-for="item of data.slice(index, 10)">{{item}}</li>
+      </ul>
+
+      <w-html></w-html>
+
+      <w-container>
+        <w-divider></w-divider>
+      </w-container>
+    </template>
+  </body>
+</html>

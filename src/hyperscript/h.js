@@ -1,0 +1,191 @@
+/**
+ * @typedef {string|HTMLElement|typeof HTMLElement} Tag
+ * @typedef {Tag|string|number|boolean|null|undefined} Child
+ * @param {Tag} tag
+ * @param {object} attrs
+ * @param {Child|(Child)[]} children
+ * @returns
+ */
+export function h(tag = '', attrs = {}, children = []) {
+  if (!(children instanceof Array)) children = [children]
+
+  let el
+  // tag
+  {
+    // 'tagName'
+    if (typeof tag === 'string') {
+      el = document.createElement(tag)
+    }
+    // HTMLElement
+    else if (tag instanceof HTMLElement) {
+      el = tag
+    }
+    // Custom Element
+    else if (tag.prototype instanceof HTMLElement) {
+      let name = customElements.getName(tag)
+      if (!name) {
+        name = `x-${tag.name.toLowerCase()}`
+        customElements.define(name, tag)
+      }
+      el = document.createElement(name)
+    }
+    // Unknown
+    else {
+      el = document.createElement('unknown')
+    }
+  }
+
+  // attrs
+  for (const key of Object.keys(attrs)) {
+    if (key === 'class') {
+      for (const className of Object.keys(attrs.class)) {
+        el.classList.add(className)
+      }
+      continue
+    }
+
+    if (key === 'style') {
+      for (const styleName of Object.keys(attrs.style)) {
+        el.style[styleName] = attrs.style[styleName]
+      }
+      continue
+    }
+
+    // props
+    // console.log(el, key, attrs[key])
+    el[key] = attrs[key]
+  }
+
+  // children
+  for (const child of children) {
+    if (child instanceof Node) {
+      el.appendChild(child)
+    } else {
+      const text = document.createTextNode(String(child ?? ''))
+      el.appendChild(text)
+    }
+  }
+
+  // el.toString = () => `<${el.localName}></${el.localName}>`
+  return el
+}
+
+export function defineElement(name) {
+  /**
+   * @param {object} attrs
+   * @param {Child|(Child)[]} children
+   */
+  return function element(attrs = {}, children = []) {
+    return h(name, attrs, children)
+  }
+}
+
+export const a = defineElement('a')
+export const article = defineElement('article')
+export const aside = defineElement('aside')
+export const audio = defineElement('audio')
+export const b = defineElement('b')
+export const base = defineElement('base')
+export const bdi = defineElement('bdi')
+export const bdo = defineElement('bdo')
+export const blockquote = defineElement('blockquote')
+export const body = defineElement('body')
+export const br = defineElement('br')
+export const button = defineElement('button')
+export const canvas = defineElement('canvas')
+export const caption = defineElement('caption')
+export const cite = defineElement('cite')
+export const code = defineElement('code')
+export const col = defineElement('col')
+export const colgroup = defineElement('colgroup')
+export const data = defineElement('data')
+export const datalist = defineElement('datalist')
+export const dd = defineElement('dd')
+export const del = defineElement('del')
+export const details = defineElement('details')
+export const dfn = defineElement('dfn')
+export const dialog = defineElement('dialog')
+export const div = defineElement('div')
+export const dl = defineElement('dl')
+export const dt = defineElement('dt')
+export const em = defineElement('em')
+export const embed = defineElement('embed')
+export const fieldset = defineElement('fieldset')
+export const figcaption = defineElement('figcaption')
+export const figure = defineElement('figure')
+export const footer = defineElement('footer')
+export const form = defineElement('form')
+export const h1 = defineElement('h1')
+export const h2 = defineElement('h2')
+export const h3 = defineElement('h3')
+export const h4 = defineElement('h4')
+export const h5 = defineElement('h5')
+export const h6 = defineElement('h6')
+export const head = defineElement('head')
+export const header = defineElement('header')
+export const hgroup = defineElement('hgroup')
+export const hr = defineElement('hr')
+export const i = defineElement('i')
+export const iframe = defineElement('iframe')
+export const img = defineElement('img')
+export const input = defineElement('input')
+export const ins = defineElement('ins')
+export const kbd = defineElement('kbd')
+export const label = defineElement('label')
+export const legend = defineElement('legend')
+export const li = defineElement('li')
+export const link = defineElement('link')
+export const main = defineElement('main')
+export const map = defineElement('map')
+export const mark = defineElement('mark')
+export const menu = defineElement('menu')
+export const menuitem = defineElement('menuitem')
+export const meta = defineElement('meta')
+export const meter = defineElement('meter')
+export const nav = defineElement('nav')
+export const noscript = defineElement('noscript')
+export const object = defineElement('object')
+export const ol = defineElement('ol')
+export const optgroup = defineElement('optgroup')
+export const option = defineElement('option')
+export const output = defineElement('output')
+export const p = defineElement('p')
+export const param = defineElement('param')
+export const picture = defineElement('picture')
+export const pre = defineElement('pre')
+export const progress = defineElement('progress')
+export const q = defineElement('q')
+export const rp = defineElement('rp')
+export const rt = defineElement('rt')
+export const rtc = defineElement('rtc')
+export const ruby = defineElement('ruby')
+export const s = defineElement('s')
+export const samp = defineElement('samp')
+export const script = defineElement('script')
+export const section = defineElement('section')
+export const select = defineElement('select')
+export const slot = defineElement('slot')
+export const small = defineElement('small')
+export const source = defineElement('source')
+export const span = defineElement('span')
+export const strong = defineElement('strong')
+export const style = defineElement('style')
+export const sub = defineElement('sub')
+export const summary = defineElement('summary')
+export const sup = defineElement('sup')
+export const tbody = defineElement('tbody')
+export const td = defineElement('td')
+export const template = defineElement('template')
+export const textarea = defineElement('textarea')
+export const tfoot = defineElement('tfoot')
+export const th = defineElement('th')
+export const thead = defineElement('thead')
+export const time = defineElement('time')
+export const title = defineElement('title')
+export const tr = defineElement('tr')
+export const track = defineElement('track')
+export const u = defineElement('u')
+export const ul = defineElement('ul')
+export const varEl = defineElement('varEl')
+export const video = defineElement('video')
+export const wbr = defineElement('wbr')

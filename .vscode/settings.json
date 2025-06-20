@@ -1,0 +1,10 @@
+{
+  "javascript.preferences.importModuleSpecifierEnding": "js",
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit",
+    "source.addMissingImports.ts": "explicit",
+    "source.removeUnusedImports": "explicit",
+    "source.removeUnused.ts": "explicit",
+    "source.organizeImports": "explicit"
+  }
+}
