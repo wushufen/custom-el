@@ -1,4 +1,4 @@
-import { h, propsKey } from './h.js'
+import { h, propsKey, updateProps } from './h.js'
 
 export class Component extends HTMLElement {
   constructor() {
@@ -107,12 +107,7 @@ export class Component extends HTMLElement {
       }
 
       // *props
-      for (const key of Object.keys(newNode[propsKey])) {
-        const newProp = newNode[key]
-        if (oldNode[key] !== newProp) {
-          oldNode[key] = newProp
-        }
-      }
+      updateProps(oldNode, newNode[propsKey])
 
       // *childNodes
       const oldChildNodes = Array.from(oldNode.childNodes)

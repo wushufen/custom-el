@@ -35,25 +35,7 @@ export function h(tag = '', props = {}, children = []) {
 
   // props
   el[propsKey] = props
-  for (const key of Object.keys(props)) {
-    if (key === 'class') {
-      for (const className of Object.keys(props.class)) {
-        el.classList.add(className)
-      }
-      continue
-    }
-
-    if (key === 'style' && props.style) {
-      for (const styleName of Object.keys(props.style)) {
-        el.style[styleName] = props.style[styleName]
-      }
-      continue
-    }
-
-    // props
-    // console.log(el, key, attrs[key])
-    el[key] = props[key]
-  }
+  updateProps(el, props)
 
   // children
   for (const child of children) {
@@ -68,6 +50,52 @@ export function h(tag = '', props = {}, children = []) {
   return el
 }
 
-export const propsKey = Symbol('props')
+/**
+ * @param {Element} el
+ * @param {object} props
+ */
+export function updateProps(el, props) {
+  for (const key of Object.keys(props)) {
+    // class
+    if (key === 'class') {
+      for (const className of Object.keys(props.class)) {
+        el.classList.add(className)
+      }
+      continue
+    }
+
+    // style
+    if (
+      key === 'style' &&
+      props.style &&
+      (el instanceof HTMLElement || el instanceof SVGElement)
+    ) {
+      for (const styleName of Object.keys(props.style)) {
+        el.style[styleName] = props.style[styleName]
+      }
+      continue
+    }
+
+    // on @
+    if (key.startsWith('on') || key.startsWith('@')) {
+      const type = key.replace(/^(on|@)/, '')
+      const onKey = `@${type}`
+      const newHandler = props[key]
+      const oldHandler = el[propsKey][onKey]
+
+      el[propsKey][onKey] = newHandler
+
+      el.removeEventListener(type, oldHandler)
+      el.addEventListener(type, newHandler)
+      continue
+    }
+
+    // props
+    el[key] = props[key]
+  }
+}
+
+// export const propsKey = Symbol('props')
+export const propsKey = '#props'
 
 export * from './tags.js'
