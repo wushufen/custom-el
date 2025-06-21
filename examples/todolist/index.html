@@ -2,13 +2,13 @@
   <head>
     <script type="module">
       import { TodoList } from './TodoList.js'
-      TodoList.defineCustomElement('x-todo-list')
+      TodoList.defineCustomElement()
     </script>
   </head>
   <body>
     <x-component attr="attr">x</x-component>
-    <x-todo-list></x-todo-list>
+    <todo-list></todo-list>
 
-    <x-todo message="ok">x</x-todo>
+    <todo message="ok">x</todo>
   </body>
 </html>

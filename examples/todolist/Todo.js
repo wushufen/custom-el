@@ -2,6 +2,7 @@ import { Component } from '../../src/Component.js'
 import html from '../../src/html.js'
 
 export class Todo extends Component {
+  static tagName = 'todo-item'
   static attrs = {
     message: String,
     done: (v) => (v === null ? false : true),

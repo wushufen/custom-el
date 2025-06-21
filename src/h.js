@@ -22,7 +22,9 @@ export function h(tag = '', props = {}, children = []) {
     else if (tag.prototype instanceof HTMLElement) {
       let name = customElements.getName(tag)
       if (!name) {
-        name = `x-${tag.name.toLowerCase()}`
+        name =
+          /**@type {typeof import('./Component.js').Component}*/ (tag)
+            .tagName || `x-${tag.name.toLowerCase()}`
         customElements.define(name, tag)
       }
       el = document.createElement(name)

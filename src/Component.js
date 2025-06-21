@@ -1,6 +1,15 @@
 import { h, propsKey, updateProps } from './h.js'
 
 export class Component extends HTMLElement {
+  static get tagName() {
+    const tagName = this.name.replace(/(.)([A-Z])/g, '$1-$2').toLowerCase()
+
+    if (!/-/.test(tagName)) {
+      return `${tagName}-el`
+    }
+
+    return tagName
+  }
   constructor() {
     super()
     this.attachShadow({ mode: 'open' })
@@ -132,7 +141,7 @@ export class Component extends HTMLElement {
   static h(props = {}, children = []) {
     return h(this, props, children)
   }
-  static defineCustomElement(tagName) {
+  static defineCustomElement(tagName = this.tagName) {
     customElements.define(tagName, this)
   }
   static {
