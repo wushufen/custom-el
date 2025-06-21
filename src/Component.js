@@ -12,18 +12,22 @@ export class Component extends HTMLElement {
     window[this.constructor.name] = this.constructor
   }
   /** attrs => props
-   * @type {Record<string, Function>}
+   * @type {Record<string, (newValue: string?, oldValue: string?) => any>}
    */
-  static props = {}
+  static attrs = {}
   static get observedAttributes() {
-    return Object.keys(this.props)
+    return Object.keys(this.attrs)
   }
-  attributeChangedCallback(name, _oldValue, newValue) {
-    console.warn(name, _oldValue, newValue)
-    const props = /**@type {typeof Component}*/ (this.constructor).props
+  /**
+   * @param {string} name
+   * @param {string?} oldValue
+   * @param {string?} newValue
+   */
+  attributeChangedCallback(name, oldValue, newValue) {
+    const attrs = /**@type {typeof Component}*/ (this.constructor).attrs
+    const converter = attrs[name]
 
-    const Type = props[name]
-    const value = Type(newValue)
+    const value = converter(newValue, oldValue)
     this[name] = value
 
     this.update()
@@ -31,7 +35,7 @@ export class Component extends HTMLElement {
   connectedCallback() {
     this.update()
 
-    // proxy fields update
+    // watch props
     for (let [key, value] of Object.entries(this)) {
       Object.defineProperty(this, key, {
         get() {

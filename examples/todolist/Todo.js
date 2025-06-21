@@ -2,7 +2,7 @@ import { Component } from '../../src/Component.js'
 import html from '../../src/html.js'
 
 export class Todo extends Component {
-  static props = {
+  static attrs = {
     message: String,
     done: (v) => (v === null ? false : true),
     date: (v) => new Date(v),
