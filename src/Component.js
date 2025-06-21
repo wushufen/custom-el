@@ -11,26 +11,21 @@ export class Component extends HTMLElement {
     // debug
     window[this.constructor.name] = this.constructor
   }
+  /** attrs => props
+   * @type {Record<string, Function>}
+   */
+  static props = {}
   static get observedAttributes() {
-    return ['value']
+    return Object.keys(this.props)
   }
-  attributeChangedCallback(name, oldValue, newValue) {
-    const debug = true
-    if (debug) {
-      console.warn({ name, oldValue, newValue })
-    }
+  attributeChangedCallback(name, _oldValue, newValue) {
+    console.warn(name, _oldValue, newValue)
+    const props = /**@type {typeof Component}*/ (this.constructor).props
 
-    // convert type
-    const value = this[name]
-    if (newValue == 'null') newValue = null
-    if (newValue == 'undefined') newValue = undefined
-    if (typeof value == 'number') newValue = Number(newValue)
-    if (typeof value == 'boolean') {
-      if (!newValue || newValue == 'false') newValue = false
-      else newValue = true
-    }
+    const Type = props[name]
+    const value = Type(newValue)
+    this[name] = value
 
-    this[name] = newValue
     this.update()
   }
   connectedCallback() {
@@ -67,23 +62,23 @@ export class Component extends HTMLElement {
     // this.shadowRoot.innerHTML = ''
     // this.shadowRoot.appendChild(this.render(this))
 
-    this.patch(this.shadowRoot.firstChild, this.render(this), this.shadowRoot)
+    this.patch(this.shadowRoot, this.shadowRoot.firstChild, this.render(this))
   }
   /**
+   * @param {ParentNode} parent
    * @param {Node?} oldNode
    * @param {Node?} newNode
-   * @param {Node} parentElement
    */
-  patch(oldNode, newNode, parentElement) {
+  patch(parent, oldNode, newNode) {
     // -
     if (oldNode && !newNode) {
-      parentElement.removeChild(oldNode)
+      parent.removeChild(oldNode)
       return
     }
 
     // +
     if (!oldNode && newNode) {
-      parentElement.appendChild(newNode)
+      parent.appendChild(newNode)
       return
     }
 
@@ -100,7 +95,7 @@ export class Component extends HTMLElement {
 
     // *type
     if (oldNode.nodeType !== newNode.nodeType) {
-      parentElement.replaceChild(newNode, oldNode)
+      parent.replaceChild(newNode, oldNode)
       return
     }
 
@@ -127,7 +122,7 @@ export class Component extends HTMLElement {
         i < Math.max(oldChildNodes.length, newChildNodes.length);
         i++
       ) {
-        this.patch(oldChildNodes[i], newChildNodes[i], oldNode)
+        this.patch(oldNode, oldChildNodes[i], newChildNodes[i])
       }
     }
   }
