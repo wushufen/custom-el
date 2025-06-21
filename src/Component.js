@@ -1,4 +1,5 @@
 import { h, propsKey, updateProps } from './h.js'
+import html from './html.js'
 
 export class Component extends HTMLElement {
   static get tagName() {
@@ -61,10 +62,12 @@ export class Component extends HTMLElement {
   adoptedCallback() {}
   /**
    * @todo vNode
+   * @param {typeof html} html
    * @param {this} props
    */
-  render(props) {
-    return h('h1', { ...props }, ['Hello World'])
+  render(html, props) {
+    props === this
+    return html`<h1>Hello World</h1>`
   }
   /**
    * @todo diff
@@ -75,7 +78,11 @@ export class Component extends HTMLElement {
     // this.shadowRoot.innerHTML = ''
     // this.shadowRoot.appendChild(this.render(this))
 
-    this.patch(this.shadowRoot, this.shadowRoot.firstChild, this.render(this))
+    this.patch(
+      this.shadowRoot,
+      this.shadowRoot.firstChild,
+      this.render(html, this)
+    )
   }
   /**
    * @param {ParentNode} parent

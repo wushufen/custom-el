@@ -1,5 +1,4 @@
 import { Component } from '../../src/Component.js'
-import html from '../../src/html.js'
 import { Todo } from './Todo.js'
 
 export class TodoList extends Component {
@@ -9,7 +8,7 @@ export class TodoList extends Component {
     { message: 'b', date: new Date(), done: true },
     { message: 'c', date: new Date(), done: false },
   ]
-  render() {
+  render(html) {
     return html`
       <div>
         <input

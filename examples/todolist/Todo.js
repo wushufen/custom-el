@@ -1,5 +1,4 @@
 import { Component } from '../../src/Component.js'
-import html from '../../src/html.js'
 
 export class Todo extends Component {
   static tagName = 'todo-item'
@@ -12,7 +11,7 @@ export class Todo extends Component {
   done = false
   date = new Date()
   remove() {}
-  render({ message, date, done }) {
+  render(html, { message, date, done }) {
     return html`
       <li
         style=${{
