@@ -1,0 +1,14 @@
+<script type="module">
+  import { Component } from '../src/Component.js'
+
+  class HelloWorld extends Component {
+    render(html, props) {
+      return html`<h1>Hello World</h1>`
+    }
+    static {
+      this.defineCustomElement()
+    }
+  }
+</script>
+
+<hello-world></hello-world>

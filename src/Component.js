@@ -11,6 +11,11 @@ export class Component extends HTMLElement {
 
     return tagName
   }
+  /**
+   * @todo template
+   * @type {HTMLTemplateElement|DocumentFragment|Element|string}
+   */
+  static template = ''
   constructor() {
     super()
     this.attachShadow({ mode: 'open' })
