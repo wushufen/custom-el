@@ -4,7 +4,7 @@
  * @param {Children} children
  * @returns
  */
-export function h(tag = '', props = {}, children = []) {
+export function createElement(tag = '', props = {}, children = []) {
   if (!(children instanceof Array)) children = [children]
 
   let el
@@ -23,7 +23,7 @@ export function h(tag = '', props = {}, children = []) {
       let name = customElements.getName(tag)
       if (!name) {
         name =
-          /**@type {typeof import('./Component.js').Component}*/ (tag)
+          /**@type {typeof import('./CustomElement.js').CustomElement}*/ (tag)
             .tagName || `x-${tag.name.toLowerCase()}`
         customElements.define(name, tag)
       }
@@ -51,6 +51,8 @@ export function h(tag = '', props = {}, children = []) {
 
   return el
 }
+
+export { createElement as h }
 
 /**
  * @param {Element} el
@@ -99,5 +101,3 @@ export function updateProps(el, props) {
 
 // export const propsKey = Symbol('props')
 export const propsKey = '#props'
-
-export * from './tags.js'

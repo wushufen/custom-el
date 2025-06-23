@@ -1,6 +1,6 @@
-import { Component } from '../../src/Component.js'
+import { CustomElement } from '../../src/index.js'
 
-export class Todo extends Component {
+export class Todo extends CustomElement {
   static tagName = 'todo-item'
   static attrs = {
     message: String,

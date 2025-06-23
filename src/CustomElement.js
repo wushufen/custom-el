@@ -1,7 +1,7 @@
-import { h, propsKey, updateProps } from './h.js'
+import { h, propsKey, updateProps } from './createElement.js'
 import html from './html.js'
 
-export class Component extends HTMLElement {
+export class CustomElement extends HTMLElement {
   static get tagName() {
     const tagName = this.name.replace(/(.)([A-Z])/g, '$1-$2').toLowerCase()
 
@@ -34,7 +34,7 @@ export class Component extends HTMLElement {
    * @param {string?} newValue
    */
   attributeChangedCallback(name, oldValue, newValue) {
-    const attrs = /**@type {typeof Component}*/ (this.constructor).attrs
+    const attrs = /**@type {typeof CustomElement}*/ (this.constructor).attrs
     const converter = attrs[name]
 
     const value = converter(newValue, oldValue)
@@ -70,18 +70,14 @@ export class Component extends HTMLElement {
     return html`<h1>Hello World</h1>`
   }
   /**
-   * @todo diff
-   * @returns
    */
   update() {
     if (!this.shadowRoot) return
-    // this.shadowRoot.innerHTML = ''
-    // this.shadowRoot.appendChild(this.render(this))
 
-    this.patch(
+    this.updateChildren(
       this.shadowRoot,
-      this.shadowRoot.firstChild,
-      this.render(html, this)
+      this.shadowRoot.childNodes,
+      [].concat(this.render(html, this))
     )
   }
   /**
@@ -130,15 +126,22 @@ export class Component extends HTMLElement {
       updateProps(oldNode, newNode[propsKey])
 
       // *childNodes
-      const oldChildNodes = Array.from(oldNode.childNodes)
-      const newChildNodes = Array.from(newNode.childNodes)
-      for (
-        let i = 0;
-        i < Math.max(oldChildNodes.length, newChildNodes.length);
-        i++
-      ) {
-        this.patch(oldNode, oldChildNodes[i], newChildNodes[i])
-      }
+      this.updateChildren(oldNode, oldNode.childNodes, newNode.childNodes)
+    }
+  }
+  /**
+   *
+   * @param {ParentNode} parent
+   * @param {Node[]|NodeList} oldChildNodes
+   * @param {Node[]|NodeList} newChildNodes
+   */
+  updateChildren(parent, oldChildNodes, newChildNodes) {
+    for (
+      let i = 0;
+      i < Math.max(oldChildNodes.length, newChildNodes.length);
+      i++
+    ) {
+      this.patch(parent, oldChildNodes[i], newChildNodes[i])
     }
   }
   /**
@@ -148,10 +151,7 @@ export class Component extends HTMLElement {
   static h(props = {}, children = []) {
     return h(this, props, children)
   }
-  static defineCustomElement(tagName = this.tagName) {
+  static define(tagName = this.tagName) {
     customElements.define(tagName, this)
-  }
-  static {
-    this.defineCustomElement('x-component')
   }
 }

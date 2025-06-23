@@ -1,7 +1,7 @@
-import { Component } from '../../src/Component.js'
+import { CustomElement } from '../../src/index.js'
 import { Todo } from './Todo.js'
 
-export class TodoList extends Component {
+export class TodoList extends CustomElement {
   input = 'input'
   list = [
     { message: 'a', date: new Date(), done: false },
@@ -51,6 +51,12 @@ export class TodoList extends Component {
           )}
         </ul>
       </div>
+      <style>
+        ul {
+          border: solid 1px;
+          border-radius: 10px;
+        }
+      </style>
     `
   }
 }

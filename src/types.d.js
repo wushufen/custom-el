@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-empty-file
 /**
  * @typedef {string|HTMLElement|typeof HTMLElement} Tag
  * @typedef {any} Class

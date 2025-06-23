@@ -6,5 +6,6 @@
     "source.removeUnusedImports": "explicit",
     "source.removeUnused.ts": "explicit",
     "source.organizeImports": "explicit"
-  }
+  },
+  "editor.foldingStrategy": "indentation"
 }
