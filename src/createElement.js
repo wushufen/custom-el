@@ -1,3 +1,5 @@
+import { toTarget } from './observer.js'
+
 /**
  * @param {Tag} tag
  * @param {Props} props
@@ -56,12 +58,12 @@ export { createElement as h }
 
 /**
  * @param {Element} el
- * @param {object} props
+ * @param {Props} props
  */
 export function updateProps(el, props) {
   for (const key of Object.keys(props)) {
     // class
-    if (key === 'class') {
+    if (key === 'class' && props.class) {
       for (const className of Object.keys(props.class)) {
         el.classList.add(className)
       }
@@ -85,7 +87,7 @@ export function updateProps(el, props) {
       const type = key.replace(/^(on|@)/, '')
       const onKey = `@${type}`
       const newHandler = props[key]
-      const oldHandler = el[propsKey][onKey]
+      const oldHandler = toTarget(el[propsKey][onKey])
 
       el[propsKey][onKey] = newHandler
 
@@ -100,4 +102,6 @@ export function updateProps(el, props) {
 }
 
 // export const propsKey = Symbol('props')
+
+/**@type{*} */
 export const propsKey = '#props'

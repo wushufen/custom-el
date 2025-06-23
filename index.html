@@ -1,0 +1,12 @@
+<html>
+  <head>
+    <script type="module">
+      import * as observer from './src/observer.js'
+      for (const key in observer) {
+        const value = observer[key]
+        window[key] = value
+      }
+    </script>
+  </head>
+  <body></body>
+</html>

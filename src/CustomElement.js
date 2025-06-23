@@ -1,5 +1,6 @@
 import { h, propsKey, updateProps } from './createElement.js'
-import html from './html.js'
+import { html } from './html.js'
+import { toProxy, watchEffect } from './observer.js'
 
 export class CustomElement extends HTMLElement {
   static get tagName() {
@@ -17,9 +18,6 @@ export class CustomElement extends HTMLElement {
     if (!this.shadowRoot) return
 
     this.shadowRoot.innerHTML = 'component'
-
-    // debug
-    window[this.constructor.name] = this.constructor
   }
   /** attrs => props
    * @type {Record<string, (newValue: string?, oldValue: string?) => any>}
@@ -43,13 +41,11 @@ export class CustomElement extends HTMLElement {
     this.update()
   }
   connectedCallback() {
-    this.update()
-
     // watch props
     for (let [key, value] of Object.entries(this)) {
       Object.defineProperty(this, key, {
         get() {
-          return value
+          return toProxy(value)
         },
         set(newValue) {
           value = newValue
@@ -57,6 +53,8 @@ export class CustomElement extends HTMLElement {
         },
       })
     }
+
+    watchEffect(() => this.update())
   }
   disconnectedCallback() {}
   adoptedCallback() {}
@@ -77,7 +75,7 @@ export class CustomElement extends HTMLElement {
     this.updateChildren(
       this.shadowRoot,
       this.shadowRoot.childNodes,
-      [].concat(this.render(html, this))
+      /**@type {Node[]}*/ ([]).concat(this.render(html, this))
     )
   }
   /**

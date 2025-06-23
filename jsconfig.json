@@ -6,9 +6,9 @@
     "jsx": "react",
     "allowImportingTsExtensions": true,
     "checkJs": true,
-    "strictNullChecks": true,
-    "strictFunctionTypes": true
+    "strict": true,
+    "noImplicitAny": true
   },
   "exclude": ["node_modules", "**/node_modules/*", "dist"],
-  "include": ["**/*.js"]
+  "include": ["**/*.js", "**/*.d.ts"]
 }

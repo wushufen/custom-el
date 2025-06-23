@@ -1,5 +1,8 @@
 import { h } from './createElement.js'
 
+/**
+ * @param {string} name
+ */
 export function defineElement(name) {
   /**
    * @param {Props} props
