@@ -6,7 +6,7 @@
 import htm from 'https://esm.sh/htm@3.1.1/es2015/mini.mjs'
 import { h } from './createElement.js'
 
-/**@type {(tpl:*)=>ReturnType<typeof h>} */
+/**@type {(strings: TemplateStringsArray, ...values: any[]) => HTMLElement} */
 export const html = htm.bind(
   /**
    * @param {string} type
@@ -14,6 +14,8 @@ export const html = htm.bind(
    * @param {...Children} children
    */
   function (type, props, ...children) {
+    // console.log({ type, props, children })
+
     return h(
       type,
       props || {}, // null?

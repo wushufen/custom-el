@@ -1,9 +1,3 @@
-import {
-  observable,
-  observe,
-  raw,
-} from 'https://esm.sh/@nx-js/observer-util?standalone'
-
 export const symbols = {
   isProxy: Symbol('isProxy'),
   getProxy: Symbol('getProxy'),
@@ -36,7 +30,6 @@ export function isProxy(target) {
  * @returns {*}
  */
 export function toTarget(proxy) {
-  if (raw) return raw(proxy)
   return proxy?.[symbols.getProxyTarget]?.() ?? proxy
 }
 
@@ -44,8 +37,6 @@ export function toTarget(proxy) {
  * @param {*} target
  */
 export function toProxy(target) {
-  if (observable) return observable(target)
-
   if (!target || (typeof target !== 'object' && typeof target !== 'function'))
     return target
 
@@ -117,8 +108,6 @@ let currentDep = null
  * @param {Function} callback
  */
 export function watchEffect(callback) {
-  if (observe) return observe(callback)
-
   currentDep = callback
   const result = callback()
   currentDep = null

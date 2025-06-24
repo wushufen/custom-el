@@ -14,3 +14,9 @@ type Child = Tag | string | number | boolean | null | undefined
 type Children = Child | Child[]
 
 type X = number
+
+interface ICustomElement {
+  render(
+    html: (strings: TemplateStringsArray, ...values: any[]) => HTMLElement
+  ): HTMLElement
+}

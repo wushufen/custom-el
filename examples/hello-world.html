@@ -1,0 +1,24 @@
+<script type="module">
+  import { CustomElement } from '../src/index.js'
+
+  class HelloWorld extends CustomElement {
+    bool = true
+    render({ html }) {
+      return html`
+        <button
+          onclick=${() => {
+            console.log('click')
+            this.bool = !this.bool
+          }}
+        >
+          ${this.bool}
+        </button>
+      `
+    }
+    static {
+      this.define()
+    }
+  }
+</script>
+
+<hello-world></hello-world>

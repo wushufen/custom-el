@@ -59,12 +59,16 @@ export class CustomElement extends HTMLElement {
   disconnectedCallback() {}
   adoptedCallback() {}
   /**
+   * @type {typeof html}
+   */
+  html(...args) {
+    return html(...args)
+  }
+  /**
    * @todo vNode
-   * @param {typeof html} html
    * @param {this} props
    */
-  render(html, props) {
-    props === this
+  render({ html }) {
     return html`<h1>Hello World</h1>`
   }
   /**
@@ -72,10 +76,12 @@ export class CustomElement extends HTMLElement {
   update() {
     if (!this.shadowRoot) return
 
+    /**@type {Node[]}*/
+    const newChildNodes = [].concat(this.render(this))
     this.updateChildren(
       this.shadowRoot,
       this.shadowRoot.childNodes,
-      /**@type {Node[]}*/ ([]).concat(this.render(html, this))
+      newChildNodes
     )
   }
   /**
@@ -141,6 +147,14 @@ export class CustomElement extends HTMLElement {
     ) {
       this.patch(parent, oldChildNodes[i], newChildNodes[i])
     }
+  }
+  /**
+   *
+   * @param {string} eventName
+   * @param {*} detail
+   */
+  emit(eventName, detail) {
+    this.dispatchEvent(new CustomEvent(eventName, { bubbles: true, detail }))
   }
   /**
    * @param {Props} props
