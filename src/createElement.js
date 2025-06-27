@@ -60,6 +60,8 @@ export { createElement as h }
  */
 export function updateProps(el, props) {
   for (const key of Object.keys(props)) {
+    const value = props[key]
+
     // class
     if (key === 'class' && props.class) {
       for (const className of Object.keys(props.class)) {
@@ -85,37 +87,20 @@ export function updateProps(el, props) {
       const type = key.replace(/^(on|@)/, '')
       const onKey = `@${type}`
       const newHandler = props[key]
-      const oldHandler = el[onKey]
-
-      // 此行会导致 onclick 重复注册
-      const oldHandler2 = el[propsKey][onKey]
-      // console.log({ oldHandler2 })
-
-      // if (oldHandler && oldHandler2) {
-      //   if (oldHandler != oldHandler2) {
-      //     console.error({
-      //       el,
-      //       type,
-      //       onKey,
-      //       oldHandler,
-      //       oldHandler2,
-      //       newHandler,
-      //     })
-      //   } else {
-      //     // debugger
-      //   }
-      // }
-
-      el[onKey] = newHandler
-      el[propsKey][onKey] = newHandler
+      const oldHandler = el[propsKey][onKey]
 
       el.removeEventListener(type, oldHandler)
       el.addEventListener(type, newHandler)
+
+      el[propsKey][onKey] = newHandler
       continue
     }
 
     // props
-    el[key] = props[key]
+    const oldValue = el[key]
+    if (value !== oldValue) {
+      el[key] = props[key]
+    }
   }
 }
 
