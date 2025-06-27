@@ -1,6 +1,6 @@
+import { effect, reactive } from 'https://esm.sh/@vue/reactivity?dev'
 import { h, propsKey, updateProps } from './createElement.js'
 import { html } from './html.js'
-import { toProxy, watchEffect } from './observer.js'
 
 export class CustomElement extends HTMLElement {
   static get tagName() {
@@ -45,7 +45,7 @@ export class CustomElement extends HTMLElement {
     for (let [key, value] of Object.entries(this)) {
       Object.defineProperty(this, key, {
         get() {
-          return toProxy(value)
+          return reactive(value)
         },
         set(newValue) {
           value = newValue
@@ -54,7 +54,7 @@ export class CustomElement extends HTMLElement {
       })
     }
 
-    watchEffect(() => this.update())
+    effect(() => this.update())
   }
   disconnectedCallback() {}
   adoptedCallback() {}
@@ -78,6 +78,7 @@ export class CustomElement extends HTMLElement {
 
     /**@type {Node[]}*/
     const newChildNodes = [].concat(this.render(this))
+    console.warn('update', newChildNodes[0])
     this.updateChildren(
       this.shadowRoot,
       this.shadowRoot.childNodes,
@@ -92,6 +93,7 @@ export class CustomElement extends HTMLElement {
   patch(parent, oldNode, newNode) {
     // -
     if (oldNode && !newNode) {
+      console.warn('removeChild', { parent, oldNode, newNode })
       parent.removeChild(oldNode)
       return
     }
@@ -140,11 +142,8 @@ export class CustomElement extends HTMLElement {
    * @param {Node[]|NodeList} newChildNodes
    */
   updateChildren(parent, oldChildNodes, newChildNodes) {
-    for (
-      let i = 0;
-      i < Math.max(oldChildNodes.length, newChildNodes.length);
-      i++
-    ) {
+    const length = Math.max(oldChildNodes.length, newChildNodes.length)
+    for (let i = 0; i < length; i++) {
       this.patch(parent, oldChildNodes[i], newChildNodes[i])
     }
   }

@@ -1,0 +1,44 @@
+/**
+ * @example
+ * Extra.get(target, key)
+ * Extra.set(target, key, value)
+ *
+ * Extra.get(target).key
+ * Extra.get(target).key = value
+ */
+export class Extra {
+  static extraMap = new WeakMap()
+  static extraKey = Symbol('extra')
+  /**
+   * @param {object} target
+   * @param {string|symbol} key
+   * @param {unknown} value
+   */
+  static set(target, key, value) {
+    this.get(target)[key] = value
+
+    return value
+  }
+  /**
+   * @param {Partial<object&{[key: symbol]: *}>} target
+   * @param {string|symbol} [key]
+   */
+  static get(target, key) {
+    let extra = this.extraMap.get(target)
+
+    if (!extra) {
+      extra = Object.create(null)
+      this.extraMap.set(target, extra)
+      Object.defineProperty(target, this.extraKey, {
+        value: extra,
+        enumerable: false,
+      })
+    }
+
+    if (key) {
+      return extra?.[key]
+    } else {
+      return extra
+    }
+  }
+}

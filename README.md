@@ -13,3 +13,6 @@
 # custom-el
 
 cusel cus-el
+
+<b style="color:#0af">def</b><b style="color:#f00">el</b>
+(**def**ine custom **el**ement)
