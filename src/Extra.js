@@ -1,3 +1,5 @@
+import { Reactive } from './Reactive.js'
+
 /**
  * @example
  * Extra.get(target, key)
@@ -24,6 +26,7 @@ export class Extra {
    * @param {string|symbol} [key]
    */
   static get(target, key) {
+    target = Reactive.toRaw(target)
     let extra = this.extraMap.get(target)
 
     if (!extra) {

@@ -49,6 +49,7 @@ export class Reactive {
       get(target, key, receiver) {
         if (key == Reactive.IS_REACTIVE_KEY) return true
         if (key == Reactive.RAW_KEY) return target
+        if (key == Extra.extraKey) return target[key]
 
         let value
         try {
@@ -59,13 +60,16 @@ export class Reactive {
         }
 
         // TypeError: 'get' on proxy: property 'prototype' is a read-only and non-configurable ...
-        // if (value == value?.constructor) return value
-        // if (value == value?.constructor?.prototype) return value
-        // if (key == 'constructor') return value
         if (value && value === value.constructor?.prototype) {
           return value
-        } else if (key == 'prototype') {
-          debugger
+        } else {
+          if (key == 'prototype') debugger
+        }
+        // constructor
+        if (value && value?.prototype?.constructor === value) {
+          return value
+        } else {
+          if (key == 'constructor') debugger
         }
 
         console.trace('[get]', { key, target })
@@ -102,19 +106,23 @@ export class Reactive {
           return Reflect.apply(
             fn,
             Reactive.toRaw(thisArg),
-            Reactive.toReactive(args)
+            args.map((a) => Reactive.toReactive(a))
           )
         }
 
         try {
-          return Reflect.apply(fn, thisArg, Reactive.toReactive(args))
+          return Reflect.apply(
+            fn,
+            thisArg,
+            args.map((a) => Reactive.toReactive(a))
+          )
         } catch (error) {
           console.warn(error)
           try {
             return Reflect.apply(
               fn,
               Reactive.toRaw(thisArg),
-              Reactive.toReactive(args)
+              args.map((a) => Reactive.toReactive(a))
             )
           } catch (error) {
             console.warn(error)
@@ -166,22 +174,43 @@ export class Reactive {
    * @param {Function} effect
    */
   static watchEffect(effect) {
-    Reactive.currentEffect = effect
-    effect()
-    Reactive.currentEffect = null
+    console.warn('[watchEffect]', effect)
 
-    return function stop() {
+    // [1].splice(0, 1) 会触发多个，要异步合并
+    // => deleteProperty 0
+    // => (1)[空] // 长度还没改正，此时触发渲染中的数组循环会有问题
+    // => trigger deleteProperty
+    // => set length:0
+    // => trigger set
+
+    // TODO 合并多个
+    Promise.resolve().then(() => {
+      // 清空依赖再重新收集，避免对象替换后仍保持依赖
+      stop()
+
+      Reactive.currentEffect = effect
+      console.warn('[effect()]', effect)
+      effect()
+      Reactive.currentEffect = null
+    })
+
+    function stop() {
       const objects = Extra.get(effect, 'objects')
       if (!objects) return
 
       for (const object of objects) {
         const depsMap = Extra.get(object, 'depsMap')
         for (const key in depsMap) {
-          depsMap[key].delete(effect)
+          if (depsMap[key].has(effect)) {
+            console.trace('[stop]', { key, object, depsMap, effect })
+
+            depsMap[key].delete(effect)
+          }
         }
       }
-      Extra.set(effect, 'objects', null)
     }
+
+    return stop
   }
 }
 
