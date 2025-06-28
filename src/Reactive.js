@@ -46,7 +46,7 @@ export class Reactive {
     if (proxy) return proxy
 
     proxy = new Proxy(target, {
-      get: (target, key, receiver) => {
+      get(target, key, receiver) {
         if (key == Reactive.IS_REACTIVE_KEY) return true
         if (key == Reactive.RAW_KEY) return target
 
@@ -73,13 +73,21 @@ export class Reactive {
 
         return Reactive.toReactive(value)
       },
-      set: (target, key, value, receiver) => {
+      set(target, key, value, receiver) {
         console.trace('[set]', { key, value, target })
         Reflect.set(target, key, Reactive.toRaw(value), receiver)
 
         Reactive.trigger(target, key)
 
         return true
+      },
+      deleteProperty(target, key) {
+        console.trace('[deleteProperty]', { key, target })
+        const result = Reflect.deleteProperty(target, key)
+
+        Reactive.trigger(target, key)
+
+        return result
       },
       apply(fn, thisArg, args) {
         console.trace('[apply]', { fn, args, thisArg })
