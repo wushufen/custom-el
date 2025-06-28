@@ -8,6 +8,7 @@ export class TodoList extends CustomElement {
     // { message: 'b', date: new Date(), done: true },
     // { message: 'c', date: new Date(), done: false },
   ]
+  set = new Set(this.list)
   render({ html }) {
     return html`
       <div>
@@ -30,7 +31,6 @@ export class TodoList extends CustomElement {
           }}
         />
         <h1>input: ${this.input}</h1>
-        ${this.list[0]?.message}
         <ul>
           ${this.list.map(
             (item) =>
@@ -43,7 +43,7 @@ export class TodoList extends CustomElement {
                   console.log('@done', this.list, item)
                 }}
                 remove=${() => {
-                  this.list = this.list.filter((i) => i !== item)
+                  this.list.splice(this.list.indexOf(item), 1)
                 }}
                 onclick=${(/**@type {MouseEvent}*/ e) => {
                   console.log(e)

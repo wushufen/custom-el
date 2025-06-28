@@ -1,3 +1,5 @@
+import { Extra } from './Extra.js'
+
 /**
  * @param {Tag} tag
  * @param {Props} props
@@ -87,12 +89,11 @@ export function updateProps(el, props) {
       const type = key.replace(/^(on|@)/, '')
       const onKey = `@${type}`
       const newHandler = props[key]
-      const oldHandler = el[propsKey][onKey]
+      const oldHandler = Extra.get(el)[onKey]
 
       el.removeEventListener(type, oldHandler)
       el.addEventListener(type, newHandler)
-
-      el[propsKey][onKey] = newHandler
+      Extra.get(el)[onKey] = newHandler
       continue
     }
 

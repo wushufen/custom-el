@@ -1,6 +1,6 @@
-import { effect, reactive } from 'https://esm.sh/@vue/reactivity?dev'
 import { h, propsKey, updateProps } from './createElement.js'
 import { html } from './html.js'
+import { Reactive } from './Reactive.js'
 
 export class CustomElement extends HTMLElement {
   static get tagName() {
@@ -45,16 +45,17 @@ export class CustomElement extends HTMLElement {
     for (let [key, value] of Object.entries(this)) {
       Object.defineProperty(this, key, {
         get() {
-          return reactive(value)
+          return Reactive.toReactive(value)
         },
         set(newValue) {
           value = newValue
-          this.update()
+          Reactive.watchEffect(this.update)
         },
       })
     }
 
-    effect(() => this.update())
+    this.update = this.update.bind(this)
+    Reactive.watchEffect(this.update)
   }
   disconnectedCallback() {}
   adoptedCallback() {}
@@ -75,10 +76,12 @@ export class CustomElement extends HTMLElement {
    */
   update() {
     if (!this.shadowRoot) return
+    console.warn('[update]', this.constructor.name)
 
     /**@type {Node[]}*/
     const newChildNodes = [].concat(this.render(this))
-    console.warn('update', newChildNodes[0])
+    console.warn('[newChildNodes]', this.constructor.name, newChildNodes)
+
     this.updateChildren(
       this.shadowRoot,
       this.shadowRoot.childNodes,

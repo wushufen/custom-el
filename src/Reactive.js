@@ -24,7 +24,7 @@ export class Reactive {
    * @param {*} target
    */
   static isReactive(target) {
-    return !!target[Reactive.IS_REACTIVE_KEY]
+    return !!target?.[Reactive.IS_REACTIVE_KEY]
   }
   /**
    * @template T
@@ -32,28 +32,47 @@ export class Reactive {
    * @returns {T}
    */
   static toReactive(target) {
+    if (!target) return target
+    if (typeof target != 'object' && typeof target != 'function') return target
+    if (target instanceof Node) return target
+
     if (Reactive.isReactive(target)) return target
-    if (!target || (typeof target != 'object' && typeof target != 'function'))
-      return target
     let proxy = Extra.get(target).proxy
     if (proxy) return proxy
 
     proxy = new Proxy(target, {
       get: (target, key, receiver) => {
-        console.trace('[get]', { key, target })
         if (key == Reactive.IS_REACTIVE_KEY) return true
         if (key == Reactive.RAW_KEY) return target
 
-        const value = Reflect.get(target, key, receiver)
+        let value
+        try {
+          value = Reflect.get(target, key, receiver)
+        } catch (error) {
+          console.warn(error)
+          value = Reflect.get(target, key)
+        }
 
         // TypeError: 'get' on proxy: property 'prototype' is a read-only and non-configurable ...
-        if (value == value?.constructor?.prototype) return value
+        // if (value == value?.constructor) return value
+        // if (value == value?.constructor?.prototype) return value
+        // if (key == 'constructor') return value
+        if (value === value?.constructor?.prototype) {
+          return value
+        } else if (key == 'prototype') {
+          debugger
+        }
+
+        console.trace('[get]', { key, target })
+        Reactive.track(target, key)
 
         return Reactive.toReactive(value)
       },
       set: (target, key, value, receiver) => {
         console.trace('[set]', { key, value, target })
-        Reflect.set(target, key, value, receiver)
+        Reflect.set(target, key, Reactive.toRaw(value), receiver)
+
+        Reactive.trigger(target, key)
 
         return true
       },
@@ -61,20 +80,76 @@ export class Reactive {
         console.trace('[apply]', { fn, args, thisArg })
 
         // TypeError: Method Map.prototype.set called on incompatible receiver #<Map>
-        if (thisArg instanceof Map || thisArg instanceof Set) {
-          return Reflect.apply(fn, Reactive.toRaw(thisArg), args)
+        if (
+          thisArg instanceof Map ||
+          thisArg instanceof Set ||
+          thisArg instanceof WeakMap ||
+          thisArg instanceof WeakSet
+        ) {
+          return Reflect.apply(
+            fn,
+            Reactive.toRaw(thisArg),
+            Reactive.toReactive(args)
+          )
         }
 
-        return Reflect.apply(
-          fn,
-          // Reactive.toRaw(thisArg),
-          thisArg,
-          Reactive.toReactive(args)
-        )
+        try {
+          return Reflect.apply(fn, thisArg, Reactive.toReactive(args))
+        } catch (error) {
+          console.warn(error)
+          try {
+            return Reflect.apply(
+              fn,
+              Reactive.toRaw(thisArg),
+              Reactive.toReactive(args)
+            )
+          } catch (error) {
+            console.warn(error)
+            return Reflect.apply(fn, Reactive.toRaw(thisArg), args)
+          }
+        }
       },
     })
 
     Extra.get(target).proxy = proxy
     return proxy
+  }
+  /**
+   * @param {object} target
+   * @param {string|symbol} key
+   */
+  static track(target, key) {
+    if (!Reactive.currentEffect) return
+    console.trace('[track]', { key, target }, Reactive.currentEffect)
+
+    const extra = Extra.get(target)
+    if (!extra.depsMap) extra.depsMap = Object.create(null)
+    if (!extra.depsMap[key]) extra.depsMap[key] = new Set()
+    extra.depsMap[key].add(Reactive.currentEffect)
+  }
+  /**
+   * @param {object} target
+   * @param {string|symbol} key
+   */
+  static trigger(target, key) {
+    const deps = Extra.get(target).depsMap?.[key]
+
+    if (!deps) return
+    for (const effect of deps) {
+      console.trace('[trigger]', { key, target }, effect)
+      Reactive.watchEffect(effect)
+    }
+  }
+  /**
+   * @type {Function?}
+   */
+  static currentEffect = null
+  /**
+   * @param {Function} effect
+   */
+  static watchEffect(effect) {
+    Reactive.currentEffect = effect
+    effect()
+    Reactive.currentEffect = null
   }
 }

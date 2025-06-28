@@ -21,10 +21,10 @@ export class TodoList extends CustomElement {
                   item.done = !item.done
 
                   // 此行会导致 onclick 多少触发，在点击 ~ 按钮时
-                  this.list = this.list
+                  this.list = this.list.filter((i) => i !== item)
                 }}
                 remove=${() => {
-                  this.list = this.list.filter((i) => i !== item)
+                  this.list.splice(this.list.indexOf(item), 1)
                 }}
                 onclick=${(/**@type {MouseEvent}*/ e) => {
                   console.log('onclick', this.list)
