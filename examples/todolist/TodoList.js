@@ -35,6 +35,7 @@ export class TodoList extends CustomElement {
           ${this.list.map(
             (item) =>
               html`<${Todo}
+                item=${item}
                 message=${item.message}
                 date=${item.date || new Date()}
                 done=${item.done}

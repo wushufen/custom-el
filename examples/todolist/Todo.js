@@ -1,4 +1,6 @@
-import { CustomElement } from '../../src/index.js'
+import { CustomElement, reactive } from '../../src/index.js'
+
+const counter = reactive({ count: 0 })
 
 export class Todo extends CustomElement {
   static tagName = 'todo-item'
@@ -7,17 +9,20 @@ export class Todo extends CustomElement {
     done: (v) => (v === null ? false : true),
     date: (v) => new Date(v),
   }
+  item = {}
   message = 'todo'
   done = false
   date = new Date()
+  x = 1
   remove() {}
-  render({ html, message, date, done }) {
+  render({ html, item, message, date, done }) {
     return html`
       <li
         style=${{
-          textDecoration: done ? 'line-through' : 'none',
+          textDecoration: item.done ? 'line-through' : 'none',
         }}
       >
+        <button>${this.x}</button>
         <span>${message}: </span>
         <small>${date.toLocaleString()}</small>
         <button
@@ -28,6 +33,7 @@ export class Todo extends CustomElement {
           ~
         </button>
         <button onclick=${() => this.remove()}>x</button>
+        <button onclick=${() => counter.count++}>${counter.count}</button>
       </li>
     `
   }

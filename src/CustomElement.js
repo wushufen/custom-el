@@ -41,6 +41,9 @@ export class CustomElement extends HTMLElement {
     this.update()
   }
   connectedCallback() {
+    console.log('[connectedCallback]', this.constructor.name)
+    this.update = this.update.bind(this)
+
     // watch props
     for (let [key, value] of Object.entries(this)) {
       Object.defineProperty(this, key, {
@@ -54,10 +57,12 @@ export class CustomElement extends HTMLElement {
       })
     }
 
-    this.update = this.update.bind(this)
-    Reactive.watchEffect(this.update)
+    this.stop = Reactive.watchEffect(this.update)
   }
-  disconnectedCallback() {}
+  disconnectedCallback() {
+    console.log('[disconnectedCallback]', this.constructor.name)
+    this.stop?.()
+  }
   adoptedCallback() {}
   /**
    * @type {typeof html}
@@ -75,8 +80,8 @@ export class CustomElement extends HTMLElement {
   /**
    */
   update() {
-    if (!this.shadowRoot) return
     console.warn('[update]', this.constructor.name)
+    if (!this.shadowRoot) return
 
     /**@type {Node[]}*/
     const newChildNodes = [].concat(this.render(this))
@@ -153,7 +158,7 @@ export class CustomElement extends HTMLElement {
   /**
    *
    * @param {string} eventName
-   * @param {*} detail
+   * @param {*} [detail]
    */
   emit(eventName, detail) {
     this.dispatchEvent(new CustomEvent(eventName, { bubbles: true, detail }))

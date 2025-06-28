@@ -20,7 +20,7 @@ export class Extra {
     return value
   }
   /**
-   * @param {Partial<object&{[key: symbol]: *}>} target
+   * @param {object} target
    * @param {string|symbol} [key]
    */
   static get(target, key) {
@@ -29,6 +29,8 @@ export class Extra {
     if (!extra) {
       extra = Object.create(null)
       this.extraMap.set(target, extra)
+
+      // debug symbol
       Object.defineProperty(target, this.extraKey, {
         value: extra,
         enumerable: false,

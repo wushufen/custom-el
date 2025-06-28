@@ -1,6 +1,11 @@
 import { Extra } from './Extra.js'
 
 export class Reactive {
+  /**
+   * @template T
+   * @param {T} target
+   * @returns {T}
+   */
   constructor(target = this) {
     return Reactive.toReactive(target)
   }
@@ -57,7 +62,7 @@ export class Reactive {
         // if (value == value?.constructor) return value
         // if (value == value?.constructor?.prototype) return value
         // if (key == 'constructor') return value
-        if (value === value?.constructor?.prototype) {
+        if (value && value === value.constructor?.prototype) {
           return value
         } else if (key == 'prototype') {
           debugger
@@ -119,22 +124,27 @@ export class Reactive {
    * @param {string|symbol} key
    */
   static track(target, key) {
-    if (!Reactive.currentEffect) return
-    console.trace('[track]', { key, target }, Reactive.currentEffect)
+    const effect = Reactive.currentEffect
+    if (!effect) return
+    console.trace('[track]', { key, target }, effect)
 
-    const extra = Extra.get(target)
-    if (!extra.depsMap) extra.depsMap = Object.create(null)
-    if (!extra.depsMap[key]) extra.depsMap[key] = new Set()
-    extra.depsMap[key].add(Reactive.currentEffect)
+    let depsMap = Extra.get(target, 'depsMap')
+    if (!depsMap) depsMap = Extra.set(target, 'depsMap', Object.create(null))
+    if (!depsMap[key]) depsMap[key] = new Set()
+    depsMap[key].add(effect)
+
+    let objects = Extra.get(effect, 'objects')
+    if (!objects) objects = Extra.set(effect, 'objects', new Set())
+    objects.add(target)
   }
   /**
    * @param {object} target
    * @param {string|symbol} key
    */
   static trigger(target, key) {
-    const deps = Extra.get(target).depsMap?.[key]
-
+    const deps = Extra.get(target, 'depsMap')?.[key]
     if (!deps) return
+
     for (const effect of deps) {
       console.trace('[trigger]', { key, target }, effect)
       Reactive.watchEffect(effect)
@@ -151,5 +161,20 @@ export class Reactive {
     Reactive.currentEffect = effect
     effect()
     Reactive.currentEffect = null
+
+    return function stop() {
+      const objects = Extra.get(effect, 'objects')
+      if (!objects) return
+
+      for (const object of objects) {
+        const depsMap = Extra.get(object, 'depsMap')
+        for (const key in depsMap) {
+          depsMap[key].delete(effect)
+        }
+      }
+      Extra.set(effect, 'objects', null)
+    }
   }
 }
+
+export const reactive = Reactive.toReactive
