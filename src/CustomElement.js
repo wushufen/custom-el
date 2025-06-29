@@ -150,7 +150,10 @@ export class CustomElement extends HTMLElement {
    * @param {Node[]|NodeList} newChildNodes
    */
   updateChildren(parent, oldChildNodes, newChildNodes) {
+    oldChildNodes = [...oldChildNodes] // 避免循环过程中删除导致下标变动
+
     const length = Math.max(oldChildNodes.length, newChildNodes.length)
+
     for (let i = 0; i < length; i++) {
       this.patch(parent, oldChildNodes[i], newChildNodes[i])
     }
