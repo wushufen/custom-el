@@ -15,9 +15,6 @@ export class CustomElement extends HTMLElement {
   constructor() {
     super()
     this.attachShadow({ mode: 'open' })
-    if (!this.shadowRoot) return
-
-    this.shadowRoot.innerHTML = 'component'
   }
   /** attrs => props
    * @type {Record<string, (newValue: string?, oldValue: string?) => any>}
@@ -81,17 +78,14 @@ export class CustomElement extends HTMLElement {
    */
   update() {
     console.warn('[update]', this.constructor.name)
-    if (!this.shadowRoot) return
 
-    /**@type {Node[]}*/
-    const newChildNodes = [].concat(this.render(this))
+    const shadowRoot = this.shadowRoot
+    if (!shadowRoot) return
+
+    const newChildNodes = /**@type {Node[]}*/ ([]).concat(this.render(this))
     console.warn('[newChildNodes]', this.constructor.name, newChildNodes)
 
-    this.updateChildren(
-      this.shadowRoot,
-      this.shadowRoot.childNodes,
-      newChildNodes
-    )
+    this.updateChildren(shadowRoot, shadowRoot.childNodes, newChildNodes)
   }
   /**
    * @param {ParentNode} parent
@@ -172,6 +166,12 @@ export class CustomElement extends HTMLElement {
    */
   static h(props = {}, children = []) {
     return h(this, props, children)
+  }
+  /**
+   * @param {Function} Class
+   */
+  static beExtendedBy(Class) {
+    Object.setPrototypeOf(Class.prototype, this.prototype)
   }
   static define(tagName = this.tagName) {
     customElements.define(tagName, this)

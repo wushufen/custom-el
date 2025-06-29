@@ -1,0 +1,9 @@
+<script type="module">
+  import { CustomElement } from '../../src/index.js'
+  import { HelloWorld } from './HelloWorld.js'
+
+  CustomElement.beExtendedBy(HelloWorld)
+  customElements.define('hello-world', HelloWorld)
+</script>
+
+<hello-world></hello-world>

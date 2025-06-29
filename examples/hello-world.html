@@ -2,18 +2,9 @@
   import { CustomElement } from '../src/index.js'
 
   class HelloWorld extends CustomElement {
-    bool = true
+    name = 'World'
     render({ html }) {
-      return html`
-        <button
-          onclick=${() => {
-            console.log('click')
-            this.bool = !this.bool
-          }}
-        >
-          ${this.bool}
-        </button>
-      `
+      return html`<h1>Hello ${this.name}</h1>`
     }
     static {
       this.define()
