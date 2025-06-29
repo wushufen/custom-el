@@ -183,8 +183,24 @@ export class Reactive {
     // => set length:0
     // => trigger set
 
-    // TODO 合并多个
-    Promise.resolve().then(() => {
+    const lastCanceler = Extra.get(effect).canceler
+    if (lastCanceler) {
+      lastCanceler.canceled = true
+    }
+
+    const promise = Promise.resolve()
+    const canceler = {
+      canceled: false,
+    }
+    Extra.set(effect, 'canceler', canceler)
+
+    promise.then(() => {
+      if (canceler.canceled) {
+        console.error('effect canceled')
+
+        return
+      }
+
       // 清空依赖再重新收集，避免对象替换后仍保持依赖
       stop()
 
