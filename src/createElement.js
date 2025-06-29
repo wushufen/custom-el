@@ -98,9 +98,20 @@ export function updateProps(el, props) {
     }
 
     // props
-    const oldValue = el[key]
-    if (value !== oldValue) {
-      el[key] = props[key]
+    if (key in el) {
+      const oldValue = el[key]
+      if (value !== oldValue) {
+        el[key] = props[key]
+      }
+    } else {
+      const oldValue = el.getAttribute(key)
+      if (oldValue !== value) {
+        if ([false, null, undefined].includes(value)) {
+          el.removeAttribute(key)
+        } else {
+          el.setAttribute(key, value === true ? '' : value)
+        }
+      }
     }
   }
 }

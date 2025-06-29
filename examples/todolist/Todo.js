@@ -34,6 +34,14 @@ export class Todo extends CustomElement {
         </button>
         <button onclick=${() => this.remove()}>x</button>
         <button onclick=${() => counter.count++}>${counter.count}</button>
+        <input
+          type="checkbox"
+          checked=${done}
+          attr=${done}
+          onchange=${() => {
+            this.emit('done')
+          }}
+        />
       </li>
     `
   }
