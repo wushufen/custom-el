@@ -1,0 +1,18 @@
+<script type="module">
+  import { CustomElement } from '../../src/index.js'
+  import style from './style.css' with { type: 'css' }
+
+  class HelloWorld extends CustomElement {
+    static style = style
+    name = 'World'
+    render({ html }) {
+      return html`<h1>Hello ${this.name}</h1>`
+    }
+    static {
+      this.define()
+    }
+  }
+</script>
+
+<h1>outside</h1>
+<hello-world></hello-world>

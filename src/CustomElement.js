@@ -3,6 +3,17 @@ import { html } from './html.js'
 import { Reactive } from './Reactive.js'
 
 export class CustomElement extends HTMLElement {
+  constructor() {
+    super()
+    const shadowRoot = this.attachShadow({ mode: 'open' })
+
+    // style
+    const Class = /**@type {typeof CustomElement}*/ (this.constructor)
+    shadowRoot.adoptedStyleSheets = /**@type {CSSStyleSheet[]}*/ ([]).concat(
+      Class.style,
+      Class.styles
+    )
+  }
   static get tagName() {
     const tagName = this.name.replace(/(.)([A-Z])/g, '$1-$2').toLowerCase()
 
@@ -12,10 +23,10 @@ export class CustomElement extends HTMLElement {
 
     return tagName
   }
-  constructor() {
-    super()
-    this.attachShadow({ mode: 'open' })
-  }
+  /**@type {CSSStyleSheet|CSSStyleSheet[]} */
+  static style = []
+  /**@type {CSSStyleSheet|CSSStyleSheet[]} */
+  static styles = []
   /** attrs => props
    * @type {Record<string, (newValue: string?, oldValue: string?) => any>}
    */
