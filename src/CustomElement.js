@@ -48,8 +48,10 @@ export class CustomElement extends HTMLElement {
           return Reactive.toReactive(value)
         },
         set(newValue) {
-          value = newValue
-          Reactive.watchEffect(this.update)
+          if (value !== newValue) {
+            value = newValue
+            Reactive.watchEffect(this.update)
+          }
         },
       })
     }
