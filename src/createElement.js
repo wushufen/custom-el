@@ -1,4 +1,5 @@
 import { Extra } from './Extra.js'
+import { Reactive } from './Reactive.js'
 
 /**
  * @param {Tag} tag
@@ -51,6 +52,8 @@ export function createElement(tag = '', props = {}, children = []) {
     }
   }
 
+  console.log('[createElement]', el)
+  Extra.set(el, 'key', Extra.get(Reactive, 'lastListItem'))
   return el
 }
 

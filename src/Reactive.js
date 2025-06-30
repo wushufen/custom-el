@@ -73,6 +73,12 @@ export class Reactive {
         }
 
         console.trace('[get]', { key, target })
+        // array
+        if (/**@type {[]}*/ (target).entries) {
+          console.warn('[item]', value)
+          Extra.set(Reactive, 'lastListItem', { key, value, target })
+        }
+
         Reactive.track(target, key)
 
         return Reactive.toReactive(value)
