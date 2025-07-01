@@ -67,13 +67,26 @@ export class CustomElement extends HTMLElement {
       })
     }
 
-    this.stop = Reactive.watchEffect(this.update)
+    // watch
+    this._unwatch = Reactive.watchEffect(this.update)
+
+    // onMounted() => onUnmounted
+    this._onUnmounted = this.onMounted()
   }
   disconnectedCallback() {
     console.log('[disconnectedCallback]', this.constructor.name)
-    this.stop?.()
+    this._unwatch?.()
+
+    this._onUnmounted?.()
+    this.onUnmounted()
   }
   adoptedCallback() {}
+  /**
+   * @returns {void|this['onUnmounted']}
+   */
+  onMounted() {}
+  onUpdated() {}
+  onUnmounted() {}
   /**
    * @type {typeof html}
    */
@@ -99,6 +112,8 @@ export class CustomElement extends HTMLElement {
     console.warn('[newChildNodes]', this.constructor.name, newChildNodes)
 
     this.updateChildren(shadowRoot, shadowRoot.childNodes, newChildNodes)
+
+    this.onUpdated()
   }
   /**
    * @param {ParentNode} parent

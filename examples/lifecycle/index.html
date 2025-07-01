@@ -1,0 +1,35 @@
+<script type="module">
+  import { CustomElement } from '../../src/index.js'
+
+  class Counter extends CustomElement {
+    count = 0
+    render({ html }) {
+      return html`<button>${this.count}</button>`
+    }
+    onMounted() {
+      console.log('onMounted')
+
+      const t = setInterval(() => {
+        console.log(this.count)
+        this.count++
+      }, 1000)
+
+      return function onUnmounted() {
+        console.log('return onUnmounted')
+
+        clearInterval(t)
+      }
+    }
+    onUpdated() {
+      console.log('onUpdated')
+    }
+    onUnmounted() {
+      console.log('onUnmounted')
+    }
+    static {
+      this.define()
+    }
+  }
+</script>
+
+<counter-el></counter-el>
