@@ -4,6 +4,7 @@
   "description": "A UI component library based on Web Components",
   "main": "src/index.js",
   "scripts": {
+    "build": "npx esbuild ./src/index.js --bundle --minify --drop:console --target=es2024 --inject:./src/globals.js --outfile=dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
