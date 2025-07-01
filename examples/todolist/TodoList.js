@@ -9,6 +9,7 @@ export class TodoList extends CustomElement {
     { message: 'c', date: new Date(), done: false },
   ]
   set = new Set(this.list)
+  /**@param {this} _ */
   render({ html }) {
     return html`
       <div>
@@ -30,6 +31,9 @@ export class TodoList extends CustomElement {
             }
           }}
         />
+        ${this.input
+          ? html`<button @click=${() => (this.input = '')}>x</button>`
+          : null}
         <h1>input: ${this.input}</h1>
         <ul>
           ${this.list.map(

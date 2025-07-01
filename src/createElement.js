@@ -47,7 +47,7 @@ export function createElement(tag = '', props = {}, children = []) {
     if (child instanceof Node) {
       el.appendChild(child)
     } else {
-      const text = document.createTextNode(String(child ?? ''))
+      const text = document.createTextNode(String(child ?? '')) // ?? 返回空文本节点避免整体结构变化太大
       el.appendChild(text)
     }
   }

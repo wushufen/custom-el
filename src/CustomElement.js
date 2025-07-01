@@ -158,6 +158,7 @@ export class CustomElement extends HTMLElement {
    */
   updateChildren(parent, oldChildNodes, newChildNodes) {
     oldChildNodes = [...oldChildNodes] // 避免循环过程中删除导致下标变动
+    newChildNodes = [...newChildNodes] // 避免循环过程新节点添加到文档导致 NodeList 下标变动
 
     const length = Math.max(oldChildNodes.length, newChildNodes.length)
 
