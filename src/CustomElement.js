@@ -86,6 +86,12 @@ export class CustomElement extends HTMLElement {
    */
   onMounted() {}
   onUpdated() {}
+  /**
+   * @param {unknown} error
+   */
+  onError(error) {
+    throw error
+  }
   onUnmounted() {}
   /**
    * @type {typeof html}
@@ -103,17 +109,21 @@ export class CustomElement extends HTMLElement {
   /**
    */
   update() {
-    console.warn('[update]', this.constructor.name)
+    try {
+      console.warn('[update]', this.constructor.name)
 
-    const shadowRoot = this.shadowRoot
-    if (!shadowRoot) return
+      const shadowRoot = this.shadowRoot
+      if (!shadowRoot) return
 
-    const newChildNodes = /**@type {Node[]}*/ ([]).concat(this.render(this))
-    console.warn('[newChildNodes]', this.constructor.name, newChildNodes)
+      const newChildNodes = /**@type {Node[]}*/ ([]).concat(this.render(this))
+      console.warn('[newChildNodes]', this.constructor.name, newChildNodes)
 
-    this.updateChildren(shadowRoot, shadowRoot.childNodes, newChildNodes)
+      this.updateChildren(shadowRoot, shadowRoot.childNodes, newChildNodes)
 
-    this.onUpdated()
+      this.onUpdated()
+    } catch (error) {
+      this.onError(error)
+    }
   }
   /**
    * @param {ParentNode} parent

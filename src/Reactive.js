@@ -99,40 +99,23 @@ export class Reactive {
 
         return result
       },
+      /**
+       * @param {Function} fn
+       */
       apply(fn, thisArg, args) {
         console.trace('[apply]', { fn, args, thisArg })
 
-        // TypeError: Method Map.prototype.set called on incompatible receiver #<Map>
-        if (
-          thisArg instanceof Map ||
-          thisArg instanceof Set ||
-          thisArg instanceof WeakMap ||
-          thisArg instanceof WeakSet
-        ) {
-          return Reflect.apply(
-            fn,
-            Reactive.toRaw(thisArg),
-            args.map((a) => Reactive.toReactive(a))
-          )
-        }
+        args = args.map((a) => Reactive.toReactive(a))
 
         try {
-          return Reflect.apply(
-            fn,
-            thisArg,
-            args.map((a) => Reactive.toReactive(a))
-          )
+          return Reflect.apply(fn, thisArg, args)
         } catch (error) {
-          console.warn(error)
-          try {
-            return Reflect.apply(
-              fn,
-              Reactive.toRaw(thisArg),
-              args.map((a) => Reactive.toReactive(a))
-            )
-          } catch (error) {
+          // TypeError: Method Map.prototype.set called on incompatible receiver #<Map>
+          if (/called on incompatible/.test(String(error))) {
             console.warn(error)
             return Reflect.apply(fn, Reactive.toRaw(thisArg), args)
+          } else {
+            throw error
           }
         }
       },
@@ -200,21 +183,25 @@ export class Reactive {
     }
     Extra.set(effect, 'canceler', canceler)
 
-    promise.then(() => {
-      if (canceler.canceled) {
-        console.error('effect canceled')
+    promise
+      .then(() => {
+        if (canceler.canceled) {
+          console.error('effect canceled')
 
-        return
-      }
+          return
+        }
 
-      // 清空依赖再重新收集，避免对象替换后仍保持依赖
-      stop()
+        // 清空依赖再重新收集，避免对象替换后仍保持依赖
+        stop()
 
-      Reactive.currentEffect = effect
-      console.warn('[effect()]', effect)
-      effect()
-      Reactive.currentEffect = null
-    })
+        Reactive.currentEffect = effect
+        console.warn('[effect()]', effect)
+        effect()
+        Reactive.currentEffect = null
+      })
+      .catch((error) => {
+        reportError(error)
+      })
 
     function stop() {
       const objects = Extra.get(effect, 'objects')

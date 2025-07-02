@@ -4,7 +4,10 @@
   class Counter extends CustomElement {
     count = 0
     render({ html }) {
-      return html`<button>${this.count}</button>`
+      return html`
+        <button @click=${() => this.count++}>+</button>
+        <${MyButton} text=${this.count}></${MyButton}>
+      `
     }
     onMounted() {
       console.log('onMounted')
@@ -28,6 +31,24 @@
     }
     static {
       this.define()
+    }
+  }
+
+  class MyButton extends CustomElement {
+    text = 0
+    onError(error) {
+      console.error('MyButton onError', error)
+    }
+    render({ html, text }) {
+      if (text < 5) {
+        throw new Error('my error')
+      }
+
+      return html`
+        <button>
+          <slot>${text}</slot>
+        </button>
+      `
     }
   }
 </script>
