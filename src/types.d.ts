@@ -9,7 +9,7 @@ type Props = Omit<Partial<HTMLElement>, 'style'> & {
   style?: Style
 } & Record<string, any>
 
-type Child = Tag | string | number | boolean | null | undefined
+type Child = Tag | string | number | boolean | null | undefined | Function
 
 type Children = Child | Child[]
 

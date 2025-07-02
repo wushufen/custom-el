@@ -1,5 +1,4 @@
 import { Extra } from './Extra.js'
-import { Reactive } from './Reactive.js'
 
 /**
  * @param {Tag} tag
@@ -10,6 +9,7 @@ import { Reactive } from './Reactive.js'
 export function createElement(tag = '', props = {}, children = []) {
   if (!(children instanceof Array)) children = [children]
 
+  /**@type {Node} */
   let el
   // tag
   {
@@ -43,17 +43,40 @@ export function createElement(tag = '', props = {}, children = []) {
   updateProps(el, props)
 
   // children
-  for (const child of children) {
-    if (child instanceof Node) {
-      el.appendChild(child)
+  for (let child of children) {
+    /**
+     * @param {Node} parent
+     * @param {*} child
+     */
+    function append(parent, child) {
+      child = child instanceof Node ? child : new Text(child ?? '') // ?? 返回空文本节点避免整体结构变化太大
+      parent.appendChild(child)
+    }
+
+    // ${()=>{}}
+    if (child instanceof Function) {
+      // for.of
+      const list = props['for.of']
+      if (list) {
+        for (const item of list) {
+          append(el, child(item))
+        }
+      }
+
+      // ()={}
+      else {
+        append(el, child())
+      }
     } else {
-      const text = document.createTextNode(String(child ?? '')) // ?? 返回空文本节点避免整体结构变化太大
-      el.appendChild(text)
+      append(el, child)
     }
   }
 
-  console.log('[createElement]', el)
-  Extra.set(el, 'key', Extra.get(Reactive, 'lastListItem'))
+  // if
+  if ('if' in props && props['if'] == false) {
+    el = new Text()
+  }
+
   return el
 }
 
@@ -66,6 +89,11 @@ export { createElement as h }
 export function updateProps(el, props) {
   for (const key of Object.keys(props)) {
     const value = props[key]
+
+    // for.of if
+    if (['for.of', 'if'].includes(key)) {
+      continue
+    }
 
     // class
     if (key === 'class' && props.class) {
