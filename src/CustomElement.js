@@ -215,4 +215,5 @@ export class CustomElement extends HTMLElement {
   static define(tagName = this.tagName) {
     customElements.define(tagName, this)
   }
+  static isClass = true
 }
