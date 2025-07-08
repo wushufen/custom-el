@@ -1,0 +1,69 @@
+// @ts-nocheck
+// oxlint-disable
+
+/**
+ * @typedef VNode
+ * @property {string?=} tagName tag, $: div#id.class
+ * @property {Object?=} style
+ * @property {(Object|string)?=} class
+ * @property {Array<VNode|()=>(VNode|Array<VNode>)>?=} children
+ */
+
+const list = [1, 2, 3]
+
+const render =
+  /**@type {()=>VNode} */
+  function render() {
+    return {
+      tagName: 'ul',
+      class: 'container',
+      style: {},
+      onclick() {
+        console.log('click')
+      },
+      children: list.map((item) => ({
+        tagName: 'li',
+        children: `item: ${item}`,
+      })),
+    }
+  } ||
+  /**@type {()=>VNode} */
+  function render() {
+    return ul({
+      class: 'container',
+      onclick() {
+        console.log('click')
+      },
+      if: true,
+      for: list.entries(),
+      children: ([key, item]) =>
+        li({
+          children: `key: ${key}, item: ${item}`,
+        }),
+    })
+  } ||
+  /**@type {()=>VNode} */
+  function render() {
+    return html`
+      <ul
+        class="container"
+        onclick=${function () {
+          console.log('click')
+        }}
+      >
+        ${list.map((item) => html`<li>item: ${item}</li>`)}
+      </ul>
+    `
+  } ||
+  /**@type {()=>string} */
+  function render() {
+    return /*html*/ `
+      <ul class="container" @click="onclick">
+        <li v-for="item of list">item: {{item}}</li>
+      </ul>
+    `
+  } ||
+  /**@type {()=>string} */
+  function render() {
+    return 'jsx...'
+  }
