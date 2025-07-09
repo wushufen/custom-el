@@ -4,12 +4,11 @@ import { Extra } from './Extra.js'
  * @param {Tag} tag
  * @param {Props} props
  * @param {Children} children
- * @returns
  */
 export function createElement(tag = '', props = {}, children = []) {
   if (!(children instanceof Array)) children = [children]
 
-  /**@type {Node} */
+  /**@type {Element} */
   let el
   // tag
   {
@@ -39,6 +38,7 @@ export function createElement(tag = '', props = {}, children = []) {
   }
 
   // props
+  // @ts-ignore
   el[propsKey] = props
   updateProps(el, props)
 
@@ -54,7 +54,7 @@ export function createElement(tag = '', props = {}, children = []) {
     }
 
     // ${()=>{}}
-    if (child instanceof Function) {
+    if (typeof child == 'function') {
       // for.of
       const list = props['for.of']
       if (list) {
@@ -74,7 +74,7 @@ export function createElement(tag = '', props = {}, children = []) {
 
   // if
   if ('if' in props && props['if'] == false) {
-    el = new Text()
+    return new Text()
   }
 
   return el
@@ -109,8 +109,9 @@ export function updateProps(el, props) {
       props.style &&
       (el instanceof HTMLElement || el instanceof SVGElement)
     ) {
-      for (const styleName of /**@type {*} */ (Object.keys(props.style))) {
-        el.style[styleName] = props.style[styleName]
+      for (const styleName in props.style) {
+        const styleValue = props.style[styleName]
+        if (styleValue !== undefined) el.style[styleName] = styleValue
       }
       continue
     }
@@ -130,8 +131,10 @@ export function updateProps(el, props) {
 
     // props
     if (key in el) {
+      // @ts-ignore
       const oldValue = el[key]
       if (value !== oldValue) {
+        // @ts-ignore
         el[key] = props[key]
       }
     } else {
@@ -149,5 +152,4 @@ export function updateProps(el, props) {
 
 // export const propsKey = Symbol('props')
 
-/**@type{*} */
 export const propsKey = '#props'

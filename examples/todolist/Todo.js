@@ -42,6 +42,7 @@ export class Todo extends CustomElement {
             this.emit('done')
           }}
         />
+        ${new Date().getTime()}
       </li>
     `
   }

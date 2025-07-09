@@ -9,6 +9,8 @@
  * @property {Array<VNode|()=>(VNode|Array<VNode>)>?=} children
  */
 
+class MyCom {}
+
 const list = [1, 2, 3]
 
 const render =
@@ -16,7 +18,6 @@ const render =
   function render() {
     return {
       tagName: 'ul',
-      class: 'container',
       style: {},
       onclick() {
         console.log('click')
@@ -37,7 +38,7 @@ const render =
       if: true,
       for: list.entries(),
       children: ([key, item]) =>
-        li({
+        new MyCom({
           children: `key: ${key}, item: ${item}`,
         }),
     })

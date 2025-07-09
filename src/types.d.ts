@@ -7,11 +7,12 @@ type Style = Partial<HTMLElement['style']>
 type Props = Omit<Partial<HTMLElement>, 'style'> & {
   class?: Class
   style?: Style
+  children?: Children
 } & Record<string, any>
 
-type Child = Tag | string | number | boolean | null | undefined | Function
+type Child = unknown
 
-type Children = Child | Child[]
+type Children = Child[]
 
 type X = number
 

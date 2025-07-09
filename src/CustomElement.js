@@ -1,6 +1,6 @@
 import { h, propsKey, updateProps } from './createElement.js'
 import { html } from './html.js'
-import { Reactive } from './Reactive.js'
+import { reactive, watchEffect } from './reactivity.js'
 
 export class CustomElement extends HTMLElement {
   constructor() {
@@ -44,6 +44,7 @@ export class CustomElement extends HTMLElement {
     const converter = attrs[name]
 
     const value = converter(newValue, oldValue)
+    // @ts-ignore
     this[name] = value
 
     this.update()
@@ -56,19 +57,19 @@ export class CustomElement extends HTMLElement {
     for (let [key, value] of Object.entries(this)) {
       Object.defineProperty(this, key, {
         get() {
-          return Reactive.toReactive(value)
+          return reactive(value)
         },
         set(newValue) {
           if (value !== newValue) {
             value = newValue
-            Reactive.watchEffect(this.update)
+            watchEffect(this.update)
           }
         },
       })
     }
 
     // watch
-    this._unwatch = Reactive.watchEffect(this.update)
+    this._unwatch = watchEffect(this.update)
 
     // onMounted() => onUnmounted
     this._onUnmounted = this.onMounted()
@@ -169,6 +170,7 @@ export class CustomElement extends HTMLElement {
       }
 
       // *props
+      // @ts-ignore
       updateProps(oldNode, newNode[propsKey])
 
       // *childNodes
@@ -201,7 +203,7 @@ export class CustomElement extends HTMLElement {
   }
   /**
    * @param {Props} props
-   * @param {Child|Child[]} children
+   * @param {Children} children
    */
   static h(props = {}, children = []) {
     return h(this, props, children)
