@@ -1,4 +1,5 @@
 import { h, propsKey, updateProps } from './createElement.js'
+import { defineProperty, instanceOf, toLowerCase } from './globals.js'
 import { html } from './html.js'
 import { reactive, watchEffect } from './reactivity.js'
 
@@ -15,7 +16,7 @@ export class CustomElement extends HTMLElement {
     )
   }
   static get tagName() {
-    const tagName = this.name.replace(/(.)([A-Z])/g, '$1-$2').toLowerCase()
+    const tagName = toLowerCase(this.name.replace(/(.)([A-Z])/g, '$1-$2'))
 
     if (!/-/.test(tagName)) {
       return `${tagName}-el`
@@ -24,9 +25,9 @@ export class CustomElement extends HTMLElement {
     return tagName
   }
   /**@type {CSSStyleSheet|CSSStyleSheet[]} */
-  static style = []
-  /**@type {CSSStyleSheet|CSSStyleSheet[]} */
   static styles = []
+  /**@type {typeof this['styles']} */
+  static style = []
   /** attrs => props
    * @type {Record<string, (newValue: string?, oldValue: string?) => any>}
    */
@@ -51,28 +52,29 @@ export class CustomElement extends HTMLElement {
   }
   connectedCallback() {
     console.log('[connectedCallback]', this.constructor.name)
-    this.update = this.update.bind(this)
-    Object.defineProperty(this.update, 'name', {
+
+    const update = (this.update = this.update.bind(this))
+    DEV: defineProperty(update, 'name', {
       value: `update[${this.constructor.name}]`,
     })
 
     // watch props
     for (let [key, value] of Object.entries(this)) {
-      Object.defineProperty(this, key, {
+      defineProperty(this, key, {
         get() {
           return reactive(value)
         },
         set(newValue) {
           if (value !== newValue) {
             value = newValue
-            watchEffect(this.update)
+            watchEffect(update)
           }
         },
       })
     }
 
     // watch
-    this._unwatch = watchEffect(this.update)
+    this._unwatch = watchEffect(update)
 
     // onMounted() => onUnmounted
     this._onUnmounted = this.onMounted()
@@ -84,7 +86,7 @@ export class CustomElement extends HTMLElement {
     this._onUnmounted?.()
     this.onUnmounted()
   }
-  adoptedCallback() {}
+  // adoptedCallback() {}
   /**
    * @returns {void|this['onUnmounted']}
    */
@@ -108,7 +110,7 @@ export class CustomElement extends HTMLElement {
    * @param {this} props
    */
   render({ html }) {
-    return html`<h1>Hello World</h1>`
+    return html`!render`
   }
   /**
    */
@@ -148,25 +150,22 @@ export class CustomElement extends HTMLElement {
       return
     }
 
-    // !!
-    if (!oldNode || !newNode) return
-
     // *text
-    if (oldNode instanceof Text && newNode instanceof Text) {
-      if (oldNode.textContent !== newNode.textContent) {
-        oldNode.textContent = newNode.textContent
+    if (instanceOf(oldNode, Text) && instanceOf(newNode, Text)) {
+      if (oldNode.data !== newNode.data) {
+        oldNode.data = newNode.data
       }
       return
     }
 
     // *type
-    if (oldNode.nodeType !== newNode.nodeType) {
+    if (oldNode && newNode && oldNode.nodeType !== newNode.nodeType) {
       parent.replaceChild(newNode, oldNode)
       return
     }
 
     // *element
-    if (oldNode instanceof Element && newNode instanceof Element) {
+    if (instanceOf(oldNode, Element) && instanceOf(newNode, Element)) {
       if (oldNode.tagName !== newNode.tagName) {
         oldNode.replaceWith(newNode)
         return

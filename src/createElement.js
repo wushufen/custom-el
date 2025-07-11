@@ -1,10 +1,17 @@
+import {
+  createElement,
+  defineProperty,
+  instanceOf,
+  toLowerCase,
+} from './globals.js'
+
 /**
  * @param {Tag} tag
  * @param {Props} props
  * @param {Children} children
  */
-export function createElement(tag = '', props = {}, children = []) {
-  if (!(children instanceof Array)) children = [children]
+export function h(tag = '', props = {}, children = []) {
+  if (!instanceOf(children, Array)) children = [children]
 
   /**@type {Element&{[propsKey]?:Props}} */
   let el
@@ -12,26 +19,26 @@ export function createElement(tag = '', props = {}, children = []) {
   {
     // 'tagName'
     if (typeof tag === 'string') {
-      el = document.createElement(tag)
+      el = createElement(tag)
     }
     // HTMLElement
-    else if (tag instanceof HTMLElement) {
+    else if (instanceOf(tag, HTMLElement)) {
       el = tag
     }
     // Custom Element
-    else if (tag.prototype instanceof HTMLElement) {
+    else if (instanceOf(tag.prototype, HTMLElement)) {
       let name = customElements.getName(tag)
       if (!name) {
         name =
           /**@type {typeof import('./CustomElement.js').CustomElement}*/ (tag)
-            .tagName || `x-${tag.name.toLowerCase()}`
+            .tagName || `x-${toLowerCase(tag.name)}`
         customElements.define(name, tag)
       }
-      el = document.createElement(name)
+      el = createElement(name)
     }
     // Unknown
     else {
-      el = document.createElement('unknown')
+      el = createElement('unknown')
     }
   }
 
@@ -45,12 +52,12 @@ export function createElement(tag = '', props = {}, children = []) {
      * @param {*} child
      */
     function append(parent, child) {
-      child = child instanceof Node ? child : new Text(child ?? '') // ?? 返回空文本节点避免整体结构变化太大
+      child = instanceOf(child, Node) ? child : new Text(child ?? '') // ?? 返回空文本节点避免整体结构变化太大
       parent.appendChild(child)
     }
 
     // ${()=>{}}
-    if (typeof child == 'function') {
+    if (instanceOf(child, Function)) {
       // for.of
       const list = props['for.of']
       if (list) {
@@ -76,7 +83,7 @@ export function createElement(tag = '', props = {}, children = []) {
   return el
 }
 
-export { createElement as h }
+export { h as createElement }
 
 /**
  * @param {Element&{[propsKey]:Props}} el
@@ -84,7 +91,7 @@ export { createElement as h }
  */
 export function updateProps(el, props) {
   if (!el[propsKey]) {
-    Object.defineProperty(el, propsKey, {
+    defineProperty(el, propsKey, {
       value: {},
       enumerable: false,
       writable: true,
@@ -112,7 +119,7 @@ export function updateProps(el, props) {
     if (
       key === 'style' &&
       props.style &&
-      (el instanceof HTMLElement || el instanceof SVGElement)
+      (instanceOf(el, HTMLElement) || instanceOf(el, SVGElement))
     ) {
       for (const styleName in props.style) {
         const styleValue = props.style[styleName]
@@ -122,7 +129,7 @@ export function updateProps(el, props) {
     }
 
     // on @
-    if (key.startsWith('on') || key.startsWith('@')) {
+    if (/^(on|@)/.test(key)) {
       const type = key.replace(/^(on|@)/, '')
       const oldHandler = el[propsKey][key]
 

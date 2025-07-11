@@ -8,6 +8,7 @@ export * from './reactivity.js'
 export * as default from './index.js'
 
 import * as module from './index.js'
-for (const key in module) {
+DEV: for (const key in module) {
+  // @ts-ignore
   window[key] = module[key]
 }

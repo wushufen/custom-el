@@ -1,3 +1,5 @@
+import { defineProperty, instanceOf } from './globals.js'
+
 const IS_REACTIVE_KEY = Symbol('#isReactive')
 const RAW_KEY = Symbol('#raw')
 
@@ -17,12 +19,12 @@ let activeEffect
  */
 function reactive(target) {
   if (!target) return target
-  if (typeof target != 'object' && typeof target != 'function') return target
+  if (!instanceOf(target, Object)) return target
   if (isReactive(target)) return target
   if (objectProxies.has(target))
     return /** @type {T} */ (objectProxies.get(target))
 
-  if (target instanceof Node) return target
+  if (instanceOf(target, Node)) return target
 
   const proxy = new Proxy(target, {
     get(target, key, receiver) {
@@ -116,7 +118,7 @@ function reactive(target) {
   })
 
   objectProxies.set(target, proxy)
-  setNonEnumProp(target, '#proxy', proxy)
+  DEV: setNonEnumProp(target, '#proxy', proxy)
   return proxy
 }
 
@@ -222,7 +224,7 @@ function track(target, key) {
   if (!keyEffects) {
     keyEffects = /**@type {{}}*/ (Object.create(null))
     objectKeyEffects.set(target, keyEffects)
-    setNonEnumProp(target, '#keyEffects', keyEffects)
+    DEV: setNonEnumProp(target, '#keyEffects', keyEffects)
   }
 
   let effects = keyEffects[key]
@@ -238,7 +240,7 @@ function track(target, key) {
   if (!objectKeys) {
     objectKeys = new Map()
     effectObjectKeys.set(activeEffect, objectKeys)
-    setNonEnumProp(activeEffect, '#objectKeys', objectKeys)
+    DEV: setNonEnumProp(activeEffect, '#objectKeys', objectKeys)
   }
 
   let keys = objectKeys.get(target)
@@ -270,7 +272,7 @@ function trigger(target, key) {
  * @param {unknown} value
  */
 function setNonEnumProp(target, key, value) {
-  Object.defineProperty(target, key, {
+  defineProperty(target, key, {
     value,
     enumerable: false,
     writable: true,
