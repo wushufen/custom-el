@@ -47,11 +47,23 @@ function reactive(target) {
     set(target, key, value, receiver) {
       console.warn('[set]', { target, key, value, receiver })
       const oldValue = Reflect.get(target, key, receiver)
+      let oldLength = Reflect.get(target, 'length', receiver)
       const result = Reflect.set(target, key, raw(value), receiver)
+      let length = Reflect.get(target, 'length', receiver)
 
       if (oldValue !== value) {
         trigger(target, key)
       }
+
+      // a = reactive([0, 1])
+      // a.push(2)
+      // 相当于以下操作
+      // a[2] = 2 // 此时原数组长度已经更新。所以此操作判断新旧长度触发
+      // a.length = 3 // 代理数组判断已经相等，不再触发
+      if (oldLength !== length) {
+        trigger(target, 'length')
+      }
+
       return result
     },
     deleteProperty(target, key) {
