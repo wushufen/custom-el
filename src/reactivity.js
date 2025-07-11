@@ -29,7 +29,13 @@ function reactive(target) {
       if (key === IS_REACTIVE_KEY) return true
       if (key === RAW_KEY) return target
 
-      const value = Reflect.get(target, key, receiver)
+      let value
+      // Uncaught TypeError: Method get Set.prototype.size called on incompatible receiver #<Set>
+      try {
+        value = Reflect.get(target, key, receiver)
+      } catch (error) {
+        value = Reflect.get(target, key)
+      }
 
       // #key ignore
       if (key.toString().startsWith('#')) return value
@@ -45,29 +51,16 @@ function reactive(target) {
       return Reflect.has(target, key)
     },
     set(target, key, value, receiver) {
-      console.warn('[set]', { target, key, value, receiver })
       const oldValue = Reflect.get(target, key, receiver)
-      let oldLength = Reflect.get(target, 'length', receiver)
       const result = Reflect.set(target, key, raw(value), receiver)
-      let length = Reflect.get(target, 'length', receiver)
 
       if (oldValue !== value) {
         trigger(target, key)
       }
 
-      // a = reactive([0, 1])
-      // a.push(2)
-      // 相当于以下操作
-      // a[2] = 2 // 此时原数组长度已经更新。所以此操作判断新旧长度触发
-      // a.length = 3 // 代理数组判断已经相等，不再触发
-      if (oldLength !== length) {
-        trigger(target, 'length')
-      }
-
       return result
     },
     deleteProperty(target, key) {
-      console.warn('[deleteProperty]', { target, key })
       const hadKey = Reflect.has(target, key)
       const result = Reflect.deleteProperty(target, key)
 
@@ -78,23 +71,45 @@ function reactive(target) {
     },
     /**
      * @param {T&Function} fn
+     * @param {{length?:*,size?:*}?} this_
      */
     apply(fn, this_, args) {
+      const _this = raw(this_)
       args = args.map((a) => reactive(a))
 
+      const oldLength = _this?.length
+      const oldSize = _this?.size
       try {
         return Reflect.apply(fn, this_, args)
       } catch (error) {
         // TypeError: Method Map.prototype.set called on incompatible receiver #<Map>
         if (/called on incompatible/.test(String(error))) {
-          DEV: if (
-            ![Map, Set, WeakMap, WeakSet, Date].some((C) => this_ instanceof C)
-          ) {
-            console.warn(error)
-          }
-          return Reflect.apply(fn, raw(this_), args)
+          return Reflect.apply(fn, _this, args)
         } else {
           throw error
+        }
+      } finally {
+        // a = reactive([0, 1])
+        // a.push(2)
+        // 相当于以下操作
+        // a[2] = 2 // 此时原数组长度已经更新。所以此操作判断新旧长度触发
+        // a.length = 3 // 代理数组判断已经相等，不再触发
+        if (_this && _this.length !== oldLength) {
+          trigger(_this, 'length')
+          // [...a] // 也触发 get length
+          // trigger(_this, Symbol.iterator)
+        }
+
+        // s = reactive(new Set)
+        // s.add(0) // 不会触发 set
+        // [...s.keys()] //
+        // [...s.values()] //
+        // [...s] // get Symbol.iterator
+        if (_this && _this.size !== oldSize) {
+          trigger(_this, 'size')
+          trigger(_this, 'keys')
+          trigger(_this, 'values')
+          trigger(_this, Symbol.iterator)
         }
       }
     },
@@ -114,7 +129,7 @@ function isReactive(target) {
 }
 
 /**
- * @template {object} T
+ * @template {*} T
  * @param {T} target
  * @returns {T}
  */
@@ -144,12 +159,6 @@ function watchEffect(effect) {
   }
 
   // a = reactive([0, 1])
-  // a.push(2)
-  // 相当于以下操作
-  // a[2] = 2 // 此时原数组长度已经更新。所以此操作判断新旧长度触发
-  // a.length = 3 // 代理数组判断已经相等，不再触发
-  //
-  // a = reactive([0, 1])
   // a.splice(0, 1)
   // 相当于以下操作，会触发多个代理操作
   // a[0] = 1 // [1, 1]
@@ -175,7 +184,7 @@ function watchEffect(effect) {
     }
   })
 
-  setNonEnumProp(effect, '#promise', promise)
+  setNonEnumProp(effect, PROMISE_KEY, promise)
 
   return () => unwatch(effect)
 }
@@ -194,8 +203,6 @@ function unwatch(effect) {
     for (const key of keys) {
       const effects = keyEffects[key]
       if (!effects) continue
-      console.trace('[unwatch]', { key, target, effects })
-
       effects.delete(effect)
     }
   }
@@ -209,7 +216,6 @@ function unwatch(effect) {
  */
 function track(target, key) {
   if (!activeEffect) return
-  console.trace('[track]', { key, target }, activeEffect)
 
   // object[key] => effects
   let keyEffects = objectKeyEffects.get(target)
@@ -254,7 +260,6 @@ function trigger(target, key) {
 
   // ...: $effect() -> track -> runs.add($effect)
   for (const effect of new Set(effects)) {
-    console.trace('[trigger]', { key, target }, effect)
     watchEffect(effect)
   }
 }
