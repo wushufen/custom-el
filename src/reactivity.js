@@ -198,14 +198,18 @@ function unwatch(effect) {
   const objectKeys = effectObjectKeys.get(effect)
   if (!objectKeys) return
 
-  for (const [target, keys] of objectKeys) {
-    const keyEffects = objectKeyEffects.get(target)
+  for (const [object, keys] of objectKeys) {
+    const keyEffects = objectKeyEffects.get(object)
     if (!keyEffects) continue
 
     for (const key of keys) {
       const effects = keyEffects[key]
       if (!effects) continue
       effects.delete(effect)
+
+      if (!effects.size) {
+        delete keyEffects[key]
+      }
     }
   }
 
