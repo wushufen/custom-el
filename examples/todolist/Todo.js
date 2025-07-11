@@ -9,7 +9,7 @@ export class Todo extends CustomElement {
     done: (v) => (v === null ? false : true),
     date: (v) => new Date(v),
   }
-  item = {}
+  item = { place: 'holder' }
   message = 'todo'
   done = false
   date = new Date()

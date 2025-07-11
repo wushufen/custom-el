@@ -1,6 +1,5 @@
-# custom-el
+# <b style="color:#0af">def</b><b style="color:#f00">el</b>.js
 
-<b style="color:#0af">def</b><b style="color:#f00">el</b>.js
 (**def**ine custom **el**ement)
 
 ## References

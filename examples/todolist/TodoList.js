@@ -5,8 +5,8 @@ export class TodoList extends CustomElement {
   input = 'input'
   list = [
     { message: 'a', date: new Date(), done: false },
-    { message: 'b', date: new Date(), done: true },
-    { message: 'c', date: new Date(), done: false },
+    // { message: 'b', date: new Date(), done: true },
+    // { message: 'c', date: new Date(), done: false },
   ]
   set = new Set(this.list)
   /**@param {this} _ */

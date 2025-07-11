@@ -1,5 +1,3 @@
-import { Extra } from './Extra.js'
-
 /**
  * @param {Tag} tag
  * @param {Props} props
@@ -8,7 +6,7 @@ import { Extra } from './Extra.js'
 export function createElement(tag = '', props = {}, children = []) {
   if (!(children instanceof Array)) children = [children]
 
-  /**@type {Element} */
+  /**@type {Element&{[propsKey]?:Props}} */
   let el
   // tag
   {
@@ -37,10 +35,8 @@ export function createElement(tag = '', props = {}, children = []) {
     }
   }
 
-  // props
-  // @ts-ignore
-  el[propsKey] = props
-  updateProps(el, props)
+  // #props
+  updateProps(/**@type {Element&{[propsKey]:Props}}*/ (el), props)
 
   // children
   for (let child of children) {
@@ -83,12 +79,21 @@ export function createElement(tag = '', props = {}, children = []) {
 export { createElement as h }
 
 /**
- * @param {Element} el
+ * @param {Element&{[propsKey]:Props}} el
  * @param {Props} props
  */
 export function updateProps(el, props) {
+  if (!el[propsKey]) {
+    Object.defineProperty(el, propsKey, {
+      value: {},
+      enumerable: false,
+      writable: true,
+    })
+  }
+
   for (const key of Object.keys(props)) {
     const value = props[key]
+    const oldValue = el[propsKey][key]
 
     // for.of if
     if (['for.of', 'if'].includes(key)) {
@@ -119,23 +124,19 @@ export function updateProps(el, props) {
     // on @
     if (key.startsWith('on') || key.startsWith('@')) {
       const type = key.replace(/^(on|@)/, '')
-      const onKey = `@${type}`
-      const newHandler = props[key]
-      const oldHandler = Extra.get(el)[onKey]
+      const oldHandler = el[propsKey][key]
 
       el.removeEventListener(type, oldHandler)
-      el.addEventListener(type, newHandler)
-      Extra.get(el)[onKey] = newHandler
+      el.addEventListener(type, value)
+      el[propsKey][key] = value
       continue
     }
 
     // props
     if (key in el) {
-      // @ts-ignore
-      const oldValue = el[key]
       if (value !== oldValue) {
         // @ts-ignore
-        el[key] = props[key]
+        el[key] = value
       }
     } else {
       const oldValue = el.getAttribute(key)
@@ -148,8 +149,8 @@ export function updateProps(el, props) {
       }
     }
   }
+
+  el[propsKey] = props
 }
 
-// export const propsKey = Symbol('props')
-
-export const propsKey = '#props'
+export const propsKey = Symbol('#props')

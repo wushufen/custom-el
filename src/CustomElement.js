@@ -52,6 +52,9 @@ export class CustomElement extends HTMLElement {
   connectedCallback() {
     console.log('[connectedCallback]', this.constructor.name)
     this.update = this.update.bind(this)
+    Object.defineProperty(this.update, 'name', {
+      value: `update[${this.constructor.name}]`,
+    })
 
     // watch props
     for (let [key, value] of Object.entries(this)) {
