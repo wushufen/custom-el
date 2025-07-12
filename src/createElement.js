@@ -15,6 +15,7 @@ export function h(tag = '', props = {}, children = []) {
   children = props.children ?? children
   delete props.children
   if (!instanceOf(children, Array)) children = [children]
+  children = children.flat()
 
   /**@type {Element&{[propsKey]?:Props}} */
   let el
