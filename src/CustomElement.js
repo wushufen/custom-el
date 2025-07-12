@@ -110,7 +110,7 @@ export class CustomElement extends HTMLElement {
    * @param {this} props
    */
   render({ html }) {
-    return html`!render`
+    return html`<h1>!render</h1>`
   }
   /**
    */

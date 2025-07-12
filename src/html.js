@@ -6,7 +6,7 @@
 import htm from 'https://esm.sh/htm@3.1.1/es2015/mini.mjs'
 import { h } from './createElement.js'
 
-/**@type {(strings: TemplateStringsArray, ...values: any[]) => HTMLElement|HTMLElement[]} */
+/**@type {(strings: TemplateStringsArray, ...values: any[]) => Node|Node[]} */
 export const html = htm.bind(
   /**
    * @param {string} type

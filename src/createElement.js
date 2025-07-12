@@ -9,8 +9,11 @@ import {
  * @param {Tag} tag
  * @param {Props} props
  * @param {Children} children
+ * @returns {Element}
  */
 export function h(tag = '', props = {}, children = []) {
+  children = props.children ?? children
+  delete props.children
   if (!instanceOf(children, Array)) children = [children]
 
   /**@type {Element&{[propsKey]?:Props}} */

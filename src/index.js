@@ -5,7 +5,7 @@ export * from './CustomElement.js'
 export * from './html.js'
 export * from './reactivity.js'
 // default *
-export * as default from './index.js'
+// export * as default from './index.js'
 
 import * as module from './index.js'
 DEV: for (const key in module) {

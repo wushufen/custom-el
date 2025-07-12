@@ -29,10 +29,16 @@ export const customElements = global.customElements
 
 export const reportError = global.reportError
 
-export const createElement = document.createElement.bind(document)
 export const defineProperty = Reflect.defineProperty
+export const deleteProperty = Reflect.deleteProperty
+export const apply = Reflect.apply
+export const set = Reflect.set
+export const get = Reflect.get
+export const has = Reflect.has
+
+export const createElement = document.createElement.bind(document)
 /**@param {string} string */
-export const toLowerCase = (string) => string?.toLowerCase()
+export const toLowerCase = (string) => string?.toLowerCase?.()
 
 /**@type {<T>(instance: unknown, Class: new () => T) => instance is T} */
 export const instanceOf = (instance, Class) => instance instanceof Class

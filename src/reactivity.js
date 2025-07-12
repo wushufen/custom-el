@@ -1,7 +1,15 @@
-import { defineProperty, instanceOf } from './globals.js'
+import {
+  apply,
+  defineProperty,
+  deleteProperty,
+  get,
+  has,
+  instanceOf,
+  set,
+} from './globals.js'
 
-const IS_REACTIVE_KEY = Symbol('#isReactive')
-const RAW_KEY = Symbol('#raw')
+const IS_REACTIVE_KEY = Symbol(/*'#isReactive'*/)
+const RAW_KEY = Symbol(/*'#raw'*/)
 
 /**@type {WeakMap<object, InstanceType<Proxy>>} */
 const objectProxies = new WeakMap()
@@ -34,9 +42,9 @@ function reactive(target) {
       let value
       // Uncaught TypeError: Method get Set.prototype.size called on incompatible receiver #<Set>
       try {
-        value = Reflect.get(target, key, receiver)
+        value = get(target, key, receiver)
       } catch (error) {
-        value = Reflect.get(target, key)
+        value = get(target, key)
       }
 
       // #key ignore
@@ -50,11 +58,11 @@ function reactive(target) {
     },
     has(target, key) {
       track(target, key)
-      return Reflect.has(target, key)
+      return has(target, key)
     },
     set(target, key, value, receiver) {
-      const oldValue = Reflect.get(target, key, receiver)
-      const result = Reflect.set(target, key, raw(value), receiver)
+      const oldValue = get(target, key, receiver)
+      const result = set(target, key, raw(value), receiver)
 
       if (oldValue !== value) {
         trigger(target, key)
@@ -63,8 +71,8 @@ function reactive(target) {
       return result
     },
     deleteProperty(target, key) {
-      const hadKey = Reflect.has(target, key)
-      const result = Reflect.deleteProperty(target, key)
+      const hadKey = has(target, key)
+      const result = deleteProperty(target, key)
 
       if (hadKey) {
         trigger(target, key)
@@ -82,11 +90,11 @@ function reactive(target) {
       const oldLength = _this?.length
       const oldSize = _this?.size
       try {
-        return Reflect.apply(fn, this_, args)
+        return apply(fn, this_, args)
       } catch (error) {
         // TypeError: Method Map.prototype.set called on incompatible receiver #<Map>
         if (/called on incompatible/.test(String(error))) {
-          return Reflect.apply(fn, _this, args)
+          return apply(fn, _this, args)
         } else {
           throw error
         }
@@ -103,7 +111,7 @@ function reactive(target) {
         }
 
         // s = reactive(new Set)
-        // s.add(0) // 不会触发 set
+        // s.add(0) // 不会触发 set size
         // [...s.keys()] //
         // [...s.values()] //
         // [...s] // get Symbol.iterator
@@ -127,7 +135,7 @@ function reactive(target) {
  * @returns {boolean}
  */
 function isReactive(target) {
-  return target[IS_REACTIVE_KEY]
+  return target?.[IS_REACTIVE_KEY]
 }
 
 /**
@@ -136,7 +144,7 @@ function isReactive(target) {
  * @returns {T}
  */
 function raw(target) {
-  return /** @type {{[RAW_KEY]: T}} */ (target)?.[RAW_KEY] || target
+  return /** @type {{[RAW_KEY]?: T}} */ (target)?.[RAW_KEY] || target
 }
 
 /**

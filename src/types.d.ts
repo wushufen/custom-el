@@ -4,15 +4,15 @@ type Class = Record<string, any>
 
 type Style = Partial<HTMLElement['style']>
 
-type Props = Omit<Partial<HTMLElement>, 'style'> & {
+type Props = Omit<Partial<HTMLElement>, 'style' | 'children'> & {
   class?: Class
   style?: Style
   children?: Children
 } & Record<string, any>
 
-type Child = unknown
+type Child = any
 
-type Children = Child[]
+type Children = any[] | any
 
 type X = number
 
