@@ -1,4 +1,4 @@
-import { h, propsKey, updateProps } from './createElement.js'
+import { propsKey, updateProps } from './createElement.js'
 import { defineProperty, instanceOf, toLowerCase } from './globals.js'
 import { html } from './html.js'
 import { reactive, watchEffect } from './reactivity.js'
@@ -8,10 +8,9 @@ class CustomElement extends HTMLElement {
     super()
     const shadowRoot = this.attachShadow({ mode: 'open' })
 
-    // style
+    // styles
     const Class = /**@type {typeof CustomElement}*/ (this.constructor)
     shadowRoot.adoptedStyleSheets = /**@type {CSSStyleSheet[]}*/ ([]).concat(
-      Class.style,
       Class.styles
     )
   }
@@ -26,8 +25,6 @@ class CustomElement extends HTMLElement {
   }
   /**@type {CSSStyleSheet|CSSStyleSheet[]} */
   static styles = []
-  /**@type {typeof this['styles']} */
-  static style = []
   /** attrs => props
    * @type {Record<string, (newValue: string?, oldValue: string?) => any>}
    */
@@ -42,11 +39,8 @@ class CustomElement extends HTMLElement {
    */
   attributeChangedCallback(name, oldValue, newValue) {
     const attrs = /**@type {typeof CustomElement}*/ (this.constructor).attrs
-    const converter = attrs[name]
 
-    const value = converter(newValue, oldValue)
-    // @ts-ignore
-    this[name] = value
+    attrs[name]?.(newValue, oldValue)
 
     this.update()
   }
@@ -204,25 +198,12 @@ class CustomElement extends HTMLElement {
   emit(eventName, detail) {
     this.dispatchEvent(new CustomEvent(eventName, { bubbles: true, detail }))
   }
-  /**
-   * @param {Props} props
-   * @param {Children} children
-   */
-  static h(props = {}, children = []) {
-    return h(this, props, children)
-  }
-  /**
-   * @param {Function} Class
-   */
-  static beExtendedBy(Class) {
-    Object.setPrototypeOf(Class.prototype, this.prototype)
-  }
   static define(tagName = this.tagName) {
     if (!customElements.getName(this)) {
       customElements.define(tagName, this)
     }
   }
-  static isClass = true
+  // static isClass = true
 }
 
 const CustomElementProxy = new Proxy(CustomElement, {
