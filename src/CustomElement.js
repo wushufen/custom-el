@@ -4,8 +4,10 @@ import { html } from './html.js'
 import { reactive, watchEffect } from './reactivity.js'
 
 class CustomElement extends HTMLElement {
-  constructor() {
+  constructor(props = {}) {
     super()
+    updateProps(this, props)
+
     const shadowRoot = this.attachShadow({ mode: 'open' })
 
     // styles

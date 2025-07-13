@@ -78,15 +78,15 @@ export function h(tag = '', props = {}, children = []) {
 export { h as createElement }
 
 /**
- * @param {Element&{[propsKey]:Props}} el
+ * @param {Element&{[propsKey]?:Props}} el
  * @param {Props} props
  */
 export function updateProps(el, props) {
   if (!el[propsKey]) {
+    DEV: el[propsKey] = {} // ts
     defineProperty(el, propsKey, {
       value: {},
       enumerable: false,
-      writable: true,
     })
   }
 
