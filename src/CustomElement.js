@@ -3,8 +3,9 @@ import { defineProperty, instanceOf, toLowerCase } from './globals.js'
 import { html } from './html.js'
 import { reactive, watchEffect } from './reactivity.js'
 
-class CustomElement extends HTMLElement {
+export class CustomElement extends HTMLElement {
   constructor(props = {}) {
+    new.target.define()
     super()
 
     this[propsKey] = props
@@ -220,17 +221,3 @@ class CustomElement extends HTMLElement {
   }
   // static isClass = true
 }
-
-const CustomElementProxy = new Proxy(CustomElement, {
-  /**
-   * @template {Function} T
-   * @param {T & typeof CustomElement} SubClass
-   * @returns {T}
-   */
-  construct(Class, args, SubClass) {
-    SubClass.define()
-    return Reflect.construct(Class, args, SubClass)
-  },
-})
-
-export { CustomElementProxy as CustomElement }
