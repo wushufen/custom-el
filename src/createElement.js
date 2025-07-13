@@ -140,10 +140,10 @@ export function updateProps(el, props) {
     } else {
       const oldValue = el.getAttribute(key)
       if (oldValue !== value) {
-        if ([false, null, undefined].includes(value)) {
-          el.removeAttribute(key)
+        if ([true, false, null, undefined].includes(value)) {
+          el.toggleAttribute(key, value)
         } else {
-          el.setAttribute(key, value === true ? '' : value)
+          el.setAttribute(key, value)
         }
       }
     }
