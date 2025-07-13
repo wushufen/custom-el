@@ -90,7 +90,7 @@ export function updateProps(el, props) {
     })
   }
 
-  for (const key of Object.keys(props)) {
+  for (const key in props) {
     const value = props[key]
     const oldValue = el[propsKey][key]
 
@@ -100,9 +100,11 @@ export function updateProps(el, props) {
     }
 
     // class
-    if (key === 'class' && props.class) {
-      for (const className of Object.keys(props.class)) {
-        el.classList.add(className)
+    if (key === 'class' && value) {
+      for (const className in value) {
+        if (oldValue?.[className] != value[className]) {
+          el.classList.toggle(className, value[className])
+        }
       }
       continue
     }
@@ -110,19 +112,22 @@ export function updateProps(el, props) {
     // style
     if (
       key === 'style' &&
-      props.style &&
+      value &&
       (instanceOf(el, HTMLElement) || instanceOf(el, SVGElement))
     ) {
-      for (const styleName in props.style) {
-        const styleValue = props.style[styleName]
-        if (styleValue !== undefined) el.style[styleName] = styleValue
+      for (const styleName in value) {
+        if (oldValue?.[styleName] != value[styleName]) {
+          // @ts-ignore
+          el.style[styleName] = value[styleName]
+        }
       }
       continue
     }
 
     // on @
-    if (/^(on|@)/.test(key)) {
-      const type = key.replace(/^(on|@)/, '')
+    const on_ = /^(on|@)/
+    if (on_.test(key)) {
+      const type = key.replace(on_, '')
       const oldHandler = el[propsKey][key]
 
       el.removeEventListener(type, oldHandler)
