@@ -53,7 +53,7 @@ class CustomElement extends HTMLElement {
   connectedCallback() {
     console.log('[connectedCallback]', this.constructor.name)
 
-    const update = (this.update = this.update.bind(this))
+    const update = this.update
     DEV: defineProperty(update, 'name', {
       value: `update[${this.constructor.name}]`,
     })
@@ -113,8 +113,9 @@ class CustomElement extends HTMLElement {
     return html`<h1>!render</h1>`
   }
   /**
+   * ()=>{} // bind(this)
    */
-  update() {
+  update = () => {
     try {
       console.warn('[update]', this.constructor.name)
 
