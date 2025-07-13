@@ -156,16 +156,16 @@ function isRaw(target) {
 }
 
 /**
- * @typedef {Promise<void>&{['#canceled']?: boolean}} CancelablePromise
+ * @typedef {Promise<void>&{['#aborted']?: boolean}} CancelablePromise
  * @typedef {Function&{['#promise']?: CancelablePromise}} Effect
  * @param {Effect} effect
  */
 function watchEffect(effect) {
   const PROMISE_KEY = '#promise'
-  const CANCELED_KEY = '#canceled'
+  const ABORTED_KEY = '#aborted'
 
   if (effect[PROMISE_KEY]) {
-    effect[PROMISE_KEY][CANCELED_KEY] = true
+    effect[PROMISE_KEY][ABORTED_KEY] = true
   }
 
   // a = reactive([0, 1])
@@ -178,7 +178,7 @@ function watchEffect(effect) {
   // 异步并取消上一个
   const promise = /**@type {CancelablePromise} */ (Promise.resolve())
   promise.then(() => {
-    if (promise[CANCELED_KEY]) return console.error('effect canceled')
+    if (promise[ABORTED_KEY]) return console.error('effect aborted')
 
     let preEffect = activeEffect
 
