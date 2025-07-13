@@ -6,7 +6,8 @@ import { reactive, watchEffect } from './reactivity.js'
 class CustomElement extends HTMLElement {
   constructor(props = {}) {
     super()
-    updateProps(this, props)
+
+    this[propsKey] = props
 
     const shadowRoot = this.attachShadow({ mode: 'open' })
 
@@ -48,6 +49,11 @@ class CustomElement extends HTMLElement {
   }
   connectedCallback() {
     console.log('[connectedCallback]', this.constructor.name)
+
+    // new (props)
+    const props = this[propsKey]
+    this[propsKey] = {}
+    updateProps(this, props)
 
     const update = this.update
     DEV: defineProperty(update, 'name', {
