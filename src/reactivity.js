@@ -126,7 +126,7 @@ function reactive(target) {
   })
 
   objectProxies.set(target, proxy)
-  DEV: setNonEnumProp(target, '#proxy', proxy)
+  DEV: setNonEnumProp(target, Symbol('#proxy'), proxy)
   return proxy
 }
 
@@ -236,7 +236,7 @@ function track(target, key) {
   if (!keyEffects) {
     keyEffects = /**@type {{}}*/ (Object.create(null))
     objectKeyEffects.set(target, keyEffects)
-    DEV: setNonEnumProp(target, '#keyEffects', keyEffects)
+    DEV: setNonEnumProp(target, Symbol('#keyEffects'), keyEffects)
   }
 
   let effects = keyEffects[key]
@@ -252,7 +252,7 @@ function track(target, key) {
   if (!objectKeys) {
     objectKeys = new Map()
     effectObjectKeys.set(activeEffect, objectKeys)
-    DEV: setNonEnumProp(activeEffect, '#objectKeys', objectKeys)
+    DEV: setNonEnumProp(activeEffect, Symbol('#objectKeys'), objectKeys)
   }
 
   let keys = objectKeys.get(target)
