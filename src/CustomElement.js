@@ -18,7 +18,7 @@ class CustomElement extends HTMLElement {
     )
   }
   static get tagName() {
-    const tagName = toLowerCase(this.name.replace(/(.)([A-Z])/g, '$1-$2'))
+    const tagName = toLowerCase(this.name.replace(/([a-z])([A-Z])/g, '$1-$2'))
 
     if (!/-/.test(tagName)) {
       return `${tagName}-el`
@@ -48,7 +48,7 @@ class CustomElement extends HTMLElement {
     this.update()
   }
   connectedCallback() {
-    console.log('[connectedCallback]', this.constructor.name)
+    console.warn('[connectedCallback]', this.constructor.name)
 
     // new (props)
     const props = this[propsKey]
@@ -82,7 +82,8 @@ class CustomElement extends HTMLElement {
     this._onUnmounted = this.onMounted()
   }
   disconnectedCallback() {
-    console.log('[disconnectedCallback]', this.constructor.name)
+    console.warn('[disconnectedCallback]', this.constructor.name)
+
     this._unwatch?.()
 
     this._onUnmounted?.()
@@ -208,6 +209,12 @@ class CustomElement extends HTMLElement {
   }
   static define(tagName = this.tagName) {
     if (!customElements.getName(this)) {
+      let name_ = tagName
+      let i = 0
+      while (customElements.get(tagName)) {
+        tagName = name_ + ++i
+      }
+
       customElements.define(tagName, this)
     }
   }
