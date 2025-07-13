@@ -2,10 +2,9 @@
   <head>
     <script type="module">
       import { TodoList } from './TodoList.js'
-      TodoList.define()
+
+      document.body.appendChild(new TodoList())
     </script>
   </head>
-  <body>
-    <todo-list></todo-list>
-  </body>
+  <body></body>
 </html>

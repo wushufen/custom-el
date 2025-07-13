@@ -15,6 +15,7 @@ export class Todo extends CustomElement {
   date = new Date()
   x = 1
   remove() {}
+  /**@param {this} props */
   render({ html, item, message, date, done }) {
     return html`
       <li

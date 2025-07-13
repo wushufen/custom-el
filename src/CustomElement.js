@@ -3,7 +3,7 @@ import { defineProperty, instanceOf, toLowerCase } from './globals.js'
 import { html } from './html.js'
 import { reactive, watchEffect } from './reactivity.js'
 
-export class CustomElement extends HTMLElement {
+class CustomElement extends HTMLElement {
   constructor() {
     super()
     const shadowRoot = this.attachShadow({ mode: 'open' })
@@ -217,7 +217,23 @@ export class CustomElement extends HTMLElement {
     Object.setPrototypeOf(Class.prototype, this.prototype)
   }
   static define(tagName = this.tagName) {
-    customElements.define(tagName, this)
+    if (!customElements.getName(this)) {
+      customElements.define(tagName, this)
+    }
   }
   static isClass = true
 }
+
+const CustomElementProxy = new Proxy(CustomElement, {
+  /**
+   * @template {Function} T
+   * @param {T & typeof CustomElement} SubClass
+   * @returns {T}
+   */
+  construct(Class, args, SubClass) {
+    SubClass.define()
+    return Reflect.construct(Class, args, SubClass)
+  },
+})
+
+export { CustomElementProxy as CustomElement }

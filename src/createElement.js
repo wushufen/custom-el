@@ -1,9 +1,4 @@
-import {
-  createElement,
-  defineProperty,
-  instanceOf,
-  toLowerCase,
-} from './globals.js'
+import { createElement, defineProperty, instanceOf } from './globals.js'
 
 /**
  * @param {Tag} tag
@@ -31,14 +26,7 @@ export function h(tag = '', props = {}, children = []) {
     }
     // Custom Element
     else if (instanceOf(tag.prototype, HTMLElement)) {
-      let name = customElements.getName(tag)
-      if (!name) {
-        name =
-          /**@type {typeof import('./CustomElement.js').CustomElement}*/ (tag)
-            .tagName || `x-${toLowerCase(tag.name)}`
-        customElements.define(name, tag)
-      }
-      el = createElement(name)
+      el = new tag()
     }
     // Unknown
     else {
