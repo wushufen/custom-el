@@ -292,22 +292,4 @@ function setNonEnumProp(target, key, value) {
   })
 }
 
-class Reactive {
-  constructor() {
-    return reactive(this)
-  }
-  isRaw() {
-    return isRaw(this)
-  }
-  isReactive() {
-    return isReactive(this)
-  }
-  toRaw() {
-    return raw(this)
-  }
-  toReactive() {
-    return reactive(this)
-  }
-}
-
-export { isRaw, isReactive, raw, Reactive, reactive, watchEffect }
+export { isRaw, isReactive, raw, reactive, watchEffect }
