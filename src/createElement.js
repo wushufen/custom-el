@@ -4,7 +4,7 @@ import { createElement, defineProperty, instanceOf } from './globals.js'
  * @param {Tag} tag
  * @param {Props} props
  * @param {Children} children
- * @returns {Element}
+ * @returns {Node}
  */
 export function h(tag = '', props = {}, children = []) {
   children = props.children ?? children
