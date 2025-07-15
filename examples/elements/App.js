@@ -1,22 +1,25 @@
 import { CustomElement } from '../../src/CustomElement.js'
 import { $for, $if, $switch } from '../../src/directives.js'
-import { button, div, input, li, style, ul } from '../../src/elements.js'
+import { button, div, h, input, li, style, ul } from '../../src/elements.js'
 
 export class App extends CustomElement {
   /**@type {(string|number)[]} */
   list = [0, 1, 2, 3]
   bool = true
-  render() {
+  /**@param {this} options */
+  render({}) {
     const { list, bool } = this
 
     return [
+      Date.now(),
+
       div({
         children: [
           button({
             onclick() {
               list.shift()
             },
-            children: '-',
+            children: () => '-',
           }),
           button({
             onclick() {
@@ -61,6 +64,11 @@ export class App extends CustomElement {
             list-style: none;
           }
           `,
+      }),
+
+      h({
+        tagName: 'button',
+        innerHTML: '<button>ok</button>',
       }),
     ]
   }

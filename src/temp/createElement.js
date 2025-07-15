@@ -1,4 +1,4 @@
-import { createElement, defineProperty, instanceOf } from './globals.js'
+import { createElement, defineProperty, instanceOf } from '../globals.js'
 
 /**
  * @param {Tag} tag

@@ -1,14 +1,6 @@
 // @ts-nocheck
 // oxlint-disable
 
-/**
- * @typedef VNode
- * @property {string?=} tagName tag, $: div#id.class
- * @property {Object?=} style
- * @property {(Object|string)?=} class
- * @property {Array<VNode|()=>(VNode|Array<VNode>)>?=} children
- */
-
 class MyCom {}
 
 const list = [1, 2, 3]

@@ -5,12 +5,12 @@
 // @ts-ignore
 import htm from 'https://esm.sh/htm@3.1.1/es2015/mini.mjs'
 
-/**@type {(strings: TemplateStringsArray, ...values: any[]) => Node|Node[]} */
+/**@type {(strings: TemplateStringsArray, ...values: any[]) => VChildren} */
 export const html = htm.bind(
   /**
    * @param {string|typeof Element} tagName
-   * @param {Props?} props
-   * @param {...Children} children
+   * @param {VElement?} props
+   * @param {...VChildren} children
    */
   function (tagName, props, ...children) {
     return {

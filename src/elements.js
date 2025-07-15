@@ -3,8 +3,9 @@
  */
 export function defineElement(tagName) {
   /**
-   * @param {Props} props
-   * @param {Children} children
+   * @param {VElement} props
+   * @param {VChildren} children
+   * @returns {VElement}
    */
   return function createElement(props = {}, children = []) {
     return {
@@ -124,3 +125,5 @@ export const ul = defineElement('ul')
 export const varEl = defineElement('var')
 export const video = defineElement('video')
 export const wbr = defineElement('wbr')
+
+export const h = div

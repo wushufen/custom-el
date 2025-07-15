@@ -1,23 +1,13 @@
-type Tag = string | HTMLElement | typeof HTMLElement
-
-type Class = Record<string, any>
-
-type Style = Partial<HTMLElement['style']>
-
-type Props = Omit<Partial<HTMLElement>, 'style' | 'children'> & {
-  class?: Class
-  style?: Style
-  children?: Children
-} & Record<string, any>
-
-type Child = any
-
-type Children = any[] | any
-
-type X = number
-
-interface ICustomElement {
-  render(
-    html: (strings: TemplateStringsArray, ...values: any[]) => HTMLElement
-  ): HTMLElement
+type VElement = Partial<Omit<HTMLElement, 'style' | 'class' | 'children'>> & {
+  style?: Partial<HTMLElement['style']>
+  class?: string | Record<string, any> | Array<string | Record<string, any>>
+  children?: VChildren
+  [key: string]: any
 }
+type VNode = VElement | string | number | boolean | null | undefined
+
+type VChildren =
+  | VNode
+  | VNode[]
+  | VNode[][] // [][]: ['s', list.map(), 'e']
+  | (() => VChildren)

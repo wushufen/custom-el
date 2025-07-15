@@ -103,8 +103,8 @@ export class CustomElement extends HTMLElement {
     return html(...args)
   }
   /**
-   * @todo vNode
    * @param {this} props
+   * @returns {VChildren}
    */
   render({ html }) {
     return html`<h1>!render</h1>`

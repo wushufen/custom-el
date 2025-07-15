@@ -10,7 +10,7 @@ import {
  * @param {Node?} parent
  * @param {Node} oldNode
  * @param {unknown} newNode
-* @example
+ * @example
  * patch(parent, oldLength, newNode) // update
  * patch(null, node, props) // createNode
  */
@@ -36,7 +36,7 @@ export function patch(parent, oldNode, newNode) {
         'innerHTML' in newNode
       )
     ) {
-    patchChildren(oldNode, newNode)
+      patchChildren(oldNode, newNode)
     }
     return
   }
@@ -252,7 +252,7 @@ export function isSameNode(oldNode, newNode) {
 }
 
 /**
- * @param {Node&{[propsKey]?:Props}} node
+ * @param {Node&{[propsKey]?:VElement}} node
  * @param {object} props
  */
 export function saveProps(node, props) {

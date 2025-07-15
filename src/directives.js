@@ -1,7 +1,7 @@
 /**
  * @param {*} bool
- * @param {*} children
- * @param {*} elseChildren
+ * @param {VChildren} children
+ * @param {VChildren} elseChildren
  */
 export function $if(bool, children, elseChildren) {
   if (bool) return typeof children == 'function' ? children() : children
@@ -20,7 +20,7 @@ export function $for(list, children) {
 
 /**
  * @param {*} value
- * @param {Record<string|symbol, *>} cases
+ * @param {Record<string|symbol, VChildren>} cases
  */
 export function $switch(value, cases) {
   const result = cases[value]
