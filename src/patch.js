@@ -120,6 +120,11 @@ export function patchProps(oldNode, newNode) {
 export function patchChildren(oldNode, newNode) {
   const oldChildNodes = [...oldNode.childNodes]
   let newChildNodes = newNode.children ?? newNode.childNodes
+
+  if (instanceOf(newChildNodes, Function)) {
+    newChildNodes = newChildNodes()
+  }
+
   if (newChildNodes?.[Symbol.iterator] && typeof newChildNodes != 'string') {
     // flat: `a ${[1, 2, 3]} b` => ['a', [1, 2, 3], 'b'] => ['a', 1, 2, 3, 'b']
     newChildNodes = [...newChildNodes].flat()
