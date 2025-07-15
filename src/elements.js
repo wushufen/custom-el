@@ -127,3 +127,4 @@ export const video = defineElement('video')
 export const wbr = defineElement('wbr')
 
 export const h = div
+export const el = div

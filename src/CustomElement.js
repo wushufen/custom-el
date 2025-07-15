@@ -137,6 +137,17 @@ export class CustomElement extends HTMLElement {
   emit(eventName, detail) {
     this.dispatchEvent(new CustomEvent(eventName, { bubbles: true, detail }))
   }
+  /**
+   *
+   * @param {VElement?=} props
+   * @returns {VElement}
+   */
+  static el(props) {
+    return {
+      tagName: this,
+      ...props,
+    }
+  }
   static define(tagName = this.tagName) {
     if (!customElements.getName(this)) {
       let name_ = tagName

@@ -1,6 +1,7 @@
 import { CustomElement } from '../../src/CustomElement.js'
 import { $for, $if, $switch } from '../../src/directives.js'
-import { button, div, h, input, li, style, ul } from '../../src/elements.js'
+import { button, div, input, li, style, ul } from '../../src/elements.js'
+import { TodoList } from '../todolist/TodoList.js'
 
 export class App extends CustomElement {
   /**@type {(string|number)[]} */
@@ -66,9 +67,12 @@ export class App extends CustomElement {
           `,
       }),
 
-      h({
-        tagName: 'button',
-        innerHTML: '<button>ok</button>',
+      TodoList.el({
+        children: [],
+      }),
+
+      CustomElement.el({
+        tagName: TodoList,
       }),
     ]
   }

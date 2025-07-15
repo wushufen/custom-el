@@ -1,4 +1,7 @@
-type VElement = Partial<Omit<HTMLElement, 'style' | 'class' | 'children'>> & {
+type VElement = Partial<
+  Omit<HTMLElement, 'tagName' | 'style' | 'class' | 'children'>
+> & {
+  tagName?: string | typeof Element
   style?: Partial<HTMLElement['style']>
   class?: string | Record<string, any> | Array<string | Record<string, any>>
   children?: VChildren
