@@ -37,7 +37,7 @@ export const get = Reflect.get
 export const has = Reflect.has
 
 export const createElement = document.createElement.bind(document)
-/**@param {string} string */
+/**@param {*} string */
 export const toLowerCase = (string) => string?.toLowerCase?.()
 
 /**@type {<T>(instance: unknown, Class: new () => T) => instance is T} */

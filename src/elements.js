@@ -1,15 +1,17 @@
-import { h } from './createElement.js'
-
 /**
- * @param {string} name
+ * @param {string} tagName
  */
-export function defineElement(name) {
+export function defineElement(tagName) {
   /**
    * @param {Props} props
    * @param {Children} children
    */
   return function createElement(props = {}, children = []) {
-    return h(name, props, props.children || children)
+    return {
+      tagName: tagName,
+      children,
+      ...props,
+    }
   }
 }
 

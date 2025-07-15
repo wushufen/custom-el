@@ -4,24 +4,20 @@
 // import htm from 'htm'
 // @ts-ignore
 import htm from 'https://esm.sh/htm@3.1.1/es2015/mini.mjs'
-import { h } from './createElement.js'
 
 /**@type {(strings: TemplateStringsArray, ...values: any[]) => Node|Node[]} */
 export const html = htm.bind(
   /**
-   * @param {string} type
-   * @param {Props} props
+   * @param {string|typeof Element} tagName
+   * @param {Props?} props
    * @param {...Children} children
    */
-  function (type, props, ...children) {
-    // console.log({ type, props, children })
-
-    return h(
-      type,
-      props || {}, // null?
-      // `a ${[1, 2, 3]} b` => ['a', [1, 2, 3], 'b'] => ['a', 1, 2, 3, 'b']
-      children.flat()
-    )
+  function (tagName, props, ...children) {
+    return {
+      children,
+      ...props, // null?
+      tagName,
+    }
   }
 )
 

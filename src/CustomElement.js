@@ -1,14 +1,12 @@
-import { propsKey, updateProps } from './createElement.js'
-import { defineProperty, instanceOf, toLowerCase } from './globals.js'
+import { defineProperty, toLowerCase } from './globals.js'
 import { html } from './html.js'
+import { patchChildren } from './patch.js'
 import { reactive, watchEffect } from './reactivity.js'
 
 export class CustomElement extends HTMLElement {
-  constructor(props = {}) {
+  constructor() {
     new.target.define()
     super()
-
-    this[propsKey] = props
 
     const shadowRoot = this.attachShadow({ mode: 'open' })
 
@@ -51,14 +49,9 @@ export class CustomElement extends HTMLElement {
   connectedCallback() {
     console.warn('[connectedCallback]', this.constructor.name)
 
-    // new (props)
-    const props = this[propsKey]
-    this[propsKey] = {}
-    updateProps(this, props)
-
     const update = this.update
     DEV: defineProperty(update, 'name', {
-      value: `update[${this.constructor.name}]`,
+      value: `<${this.constructor.name}>.update`,
     })
 
     // watch props
@@ -126,78 +119,14 @@ export class CustomElement extends HTMLElement {
       const shadowRoot = this.shadowRoot
       if (!shadowRoot) return
 
-      const newChildNodes = /**@type {Node[]}*/ ([]).concat(this.render(this))
+      const newChildNodes = this.render(this)
       console.warn('[newChildNodes]', this.constructor.name, newChildNodes)
 
-      this.updateChildren(shadowRoot, shadowRoot.childNodes, newChildNodes)
+      patchChildren(shadowRoot, { children: newChildNodes })
 
       this.onUpdated()
     } catch (error) {
       this.onError(error)
-    }
-  }
-  /**
-   * @param {ParentNode} parent
-   * @param {Node?} oldNode
-   * @param {Node?} newNode
-   */
-  patch(parent, oldNode, newNode) {
-    // -
-    if (oldNode && !newNode) {
-      console.warn('removeChild', { parent, oldNode, newNode })
-      parent.removeChild(oldNode)
-      return
-    }
-
-    // +
-    if (!oldNode && newNode) {
-      parent.appendChild(newNode)
-      return
-    }
-
-    // *text
-    if (instanceOf(oldNode, Text) && instanceOf(newNode, Text)) {
-      if (oldNode.data !== newNode.data) {
-        oldNode.data = newNode.data
-      }
-      return
-    }
-
-    // *type
-    if (oldNode && newNode && oldNode.nodeType !== newNode.nodeType) {
-      parent.replaceChild(newNode, oldNode)
-      return
-    }
-
-    // *element
-    if (instanceOf(oldNode, Element) && instanceOf(newNode, Element)) {
-      if (oldNode.tagName !== newNode.tagName) {
-        oldNode.replaceWith(newNode)
-        return
-      }
-
-      // *props
-      // @ts-ignore
-      updateProps(oldNode, newNode[propsKey])
-
-      // *childNodes
-      this.updateChildren(oldNode, oldNode.childNodes, newNode.childNodes)
-    }
-  }
-  /**
-   *
-   * @param {ParentNode} parent
-   * @param {Node[]|NodeList} oldChildNodes
-   * @param {Node[]|NodeList} newChildNodes
-   */
-  updateChildren(parent, oldChildNodes, newChildNodes) {
-    oldChildNodes = [...oldChildNodes] // 避免循环过程中删除导致下标变动
-    newChildNodes = [...newChildNodes] // 避免循环过程新节点添加到文档导致 NodeList 下标变动
-
-    const length = Math.max(oldChildNodes.length, newChildNodes.length)
-
-    for (let i = 0; i < length; i++) {
-      this.patch(parent, oldChildNodes[i], newChildNodes[i])
     }
   }
   /**

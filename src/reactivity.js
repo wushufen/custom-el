@@ -188,7 +188,9 @@ function watchEffect(effect) {
       activeEffect = effect
       effect()
     } catch (error) {
-      reportError(error)
+      setTimeout(() => {
+        throw error
+      })
     } finally {
       activeEffect = preEffect
     }
