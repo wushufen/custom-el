@@ -76,9 +76,12 @@ export function patchProps(oldNode, newNode) {
     }
 
     // on @
-    const on_ = /^(on|@)/
+    const on_ = /^(on|@)(?=.)/
     if (on_.test(key)) {
-      const type = key.replace(on_, '')
+      const type = key
+        .replace(on_, '') // - on @
+        .replace(/^./, toLowerCase) // Click => click
+
       const oldHandler = oldProps[key]
 
       oldNode.removeEventListener(type, oldHandler)
