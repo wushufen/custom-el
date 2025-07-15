@@ -7,14 +7,17 @@ import {
 } from './globals.js'
 
 /**
- * @param {Node} parent
+ * @param {Node?} parent
  * @param {Node} oldNode
  * @param {unknown} newNode
+* @example
+ * patch(parent, oldLength, newNode) // update
+ * patch(null, node, props) // createNode
  */
 export function patch(parent, oldNode, newNode) {
   // *type
   if (!isSameNode(oldNode, newNode)) {
-    parent.replaceChild(createNode(newNode), oldNode)
+    parent?.replaceChild(createNode(newNode), oldNode)
     return
   }
 
@@ -26,7 +29,15 @@ export function patch(parent, oldNode, newNode) {
     patchProps(oldNode, newNode)
 
     // *childNodes
+    if (
+      !(
+        'textContent' in newNode ||
+        'innerText' in newNode ||
+        'innerHTML' in newNode
+      )
+    ) {
     patchChildren(oldNode, newNode)
+    }
     return
   }
 
@@ -201,8 +212,7 @@ export function createNode(object) {
   }
 
   if (node) {
-    patchProps(node, object)
-    patchChildren(node, object)
+    patch(null, node, object)
 
     return node
   }
