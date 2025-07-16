@@ -128,3 +128,4 @@ export const wbr = defineElement('wbr')
 
 export const h = div
 export const el = div
+export const component = div

@@ -13,7 +13,7 @@ export class Header extends CustomElement {
           this.props.count++
         }}
       >
-        ${this.props.count}
+        <slot>slot</slot>
       </button>
     `
   }

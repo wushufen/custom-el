@@ -15,6 +15,11 @@ import {
  * patch(null, node, props) // createNode
  */
 export function patch(parent, oldNode, newNode) {
+  // function
+  if (instanceOf(newNode, Function)) {
+    newNode = newNode()
+  }
+
   // *type
   if (!isSameNode(oldNode, newNode)) {
     parent?.replaceChild(createNode(newNode), oldNode)
@@ -23,6 +28,7 @@ export function patch(parent, oldNode, newNode) {
 
   // *element
   if (instanceOf(oldNode, Element)) {
+    // customElement vs CustomElement
     if (typeof newNode != 'object' || !newNode) return
 
     // *props
@@ -191,40 +197,55 @@ export function patchText(oldNode, newNode) {
 
 /**
  * @param {unknown} object
+ * @returns {Node}
  */
 export function createNode(object) {
-  let node
+  // function | CustomElement
+  if (instanceOf(object, Function)) {
+    // CustomElement
+    if (instanceOf(object.prototype, Element)) {
+      return new /** @type {new () => Node} */ (object)()
+    }
+    // ()=>1
+    else {
+      return createNode(object())
+    }
+  }
 
+  // node
   if (instanceOf(object, Node)) {
     return object
+  }
+
+  // element
+  // @ts-ignore
+  const tagName = object?.is || object?.tagName
+  if (tagName) {
+    let node
+
+    // CustomElement
+    if (instanceOf(tagName.prototype, Element)) {
+      node = new tagName()
+    }
+    // tag
+    else {
+      node = createElement(String(tagName || 'div'))
+    }
+
+    // props
+    if (node) {
+      patch(null, node, object)
+
+      return node
+    }
   }
 
   // text
   if (typeof object !== 'object' || !object) {
     return new Text(String(object ?? ''))
   }
-  // element
-  else if (typeof object === 'object' && 'tagName' in object) {
-    const tagName = object.tagName
 
-    // CustomElement
-    if (
-      instanceOf(/**@type {typeof Element}*/ (tagName).prototype, HTMLElement)
-    ) {
-      node = new /**@type {typeof Element}*/ (tagName)()
-    }
-    // tagName
-    else {
-      node = createElement(String(tagName || 'div'))
-    }
-  }
-
-  if (node) {
-    patch(null, node, object)
-
-    return node
-  }
-
+  // unknown
   return new Comment(String(object))
 }
 
@@ -236,17 +257,22 @@ export function createNode(object) {
  * isSameNode(div, {tagName: 'span'}) // false
  * isSameNode(text, {tagName: 'div'}) // false
  * isSameNode(text, 'text2'}) // true
- * isSameNode(customEl, {tagName: CustomEl}) // true
+ * isSameNode(customElement, {tagName: CustomElement}) // true
+ * isSameNode(customElement, CustomElement) // true
  */
 export function isSameNode(oldNode, newNode) {
+  // CustomElement
+  if (oldNode.constructor == newNode) return true
+
   // *text
   if (!newNode || typeof newNode != 'object') {
     return instanceOf(oldNode, Text)
   }
 
   // *tagName
-  if ('tagName' in newNode) {
-    const tagName = /**@type {string|typeof Element}*/ (newNode.tagName)
+  // @ts-ignore
+  const tagName = newNode?.is || newNode?.tagName
+  if (tagName) {
     if (instanceOf(tagName, Function) && instanceOf(oldNode, tagName)) {
       return true
     }

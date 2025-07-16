@@ -47,8 +47,8 @@ function reactive(target) {
         value = get(target, key)
       }
 
-      // #key ignore
-      if (key.toString().startsWith('#')) return value
+      // ignore: '#key' | Symbol('#key')
+      if (String(key).startsWith('#')) return value
 
       // TypeError: 'get' on proxy: property 'prototype' is a read-only and non-configurable ...
       if (value === value?.constructor?.prototype) return value

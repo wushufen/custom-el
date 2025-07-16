@@ -1,4 +1,5 @@
 import { CustomElement } from '../../src/index.js'
+import { TodoList } from '../todolist/TodoList.js'
 import { Header } from './Header.js'
 
 export class App extends CustomElement {
@@ -26,7 +27,9 @@ export class App extends CustomElement {
 
       <hr />
 
-      <${Header} title=${this.props.title} />
+      <${Header} title=${this.props.title}>
+        ${() => TodoList}
+      </${Header}>
     `
   }
 }

@@ -1,6 +1,14 @@
 import { CustomElement } from '../../src/CustomElement.js'
 import { $for, $if, $switch } from '../../src/directives.js'
-import { button, div, input, li, style, ul } from '../../src/elements.js'
+import {
+  button,
+  component,
+  div,
+  input,
+  li,
+  style,
+  ul,
+} from '../../src/elements.js'
 import { TodoList } from '../todolist/TodoList.js'
 
 export class App extends CustomElement {
@@ -67,9 +75,11 @@ export class App extends CustomElement {
           `,
       }),
 
-      TodoList.el({
-        children: [],
-      }),
+      TodoList,
+
+      component({ is: TodoList }),
+
+      TodoList.el(),
 
       CustomElement.el({
         tagName: TodoList,
