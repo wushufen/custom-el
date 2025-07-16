@@ -62,6 +62,11 @@ export function patchProps(oldNode, newNode) {
 
     // class
     if (key === 'class' && newValue) {
+      if (typeof newValue === 'string') {
+        oldNode.className = newValue
+        continue
+      }
+
       for (const className in newValue) {
         if (oldValue?.[className] != newValue[className]) {
           oldNode.classList.toggle(className, newValue[className])
@@ -76,11 +81,14 @@ export function patchProps(oldNode, newNode) {
       newValue &&
       (instanceOf(oldNode, HTMLElement) || instanceOf(oldNode, SVGElement))
     ) {
-      for (const styleName in newValue) {
-        if (oldValue?.[styleName] != newValue[styleName]) {
-          oldNode.style[
-            /**@type {keyof Element['computedStyleMap']}*/ (styleName)
-          ] = newValue[styleName]
+      if (typeof newValue === 'string') {
+        oldNode.style = newValue
+        continue
+      }
+
+      for (const [styleName, styleValue] of Object.entries(newValue)) {
+        if (oldValue?.[styleName] != styleValue) {
+          oldNode.style.setProperty(styleName, styleValue)
         }
       }
       continue
