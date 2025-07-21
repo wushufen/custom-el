@@ -1,26 +1,29 @@
+<script type="importmap">
+  {
+    "imports": {
+      "defel": "../src/index.js",
+      "defel.js": "../src/index.js",
+      "defel/elements": "../src/elements.js",
+      "defel/elements.js": "../src/elements.js",
+      "-": "-"
+    }
+  }
+</script>
+
 <script type="module">
-  import { CustomElement } from '../src/index.js'
+  import { CustomElement } from 'defel'
+  import { button } from 'defel/elements'
 
   class HelloWorld extends CustomElement {
     name = 'World'
+    onclick = () => {
+      this.name = 'Defel'
+    }
     render({ html }) {
-      return html`<h1 class=${{ xxx: this.name }}>Hello ${this.name}</h1>`
+      return html`<h1 onclick=${this.onclick}>Hello ${this.name}</h1>`
     }
   }
 
-  window.HelloWorld = HelloWorld
-
-  document.body.append(
-    new HelloWorld({
-      name: 'my world2',
-      id: 'app',
-      style: {
-        display: 'block',
-        padding: '8px',
-        border: '1px solid #000',
-      },
-    })
-  )
+  const helloWorld = new HelloWorld()
+  document.body.append(helloWorld)
 </script>
-
-<!-- <hello-world></hello-world> -->
