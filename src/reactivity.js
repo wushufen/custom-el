@@ -26,7 +26,6 @@ let activeEffect
  * @returns {T}
  */
 function reactive(target) {
-  if (!target) return target
   if (!instanceOf(target, Object)) return target
   if (isReactive(target)) return target
   if (objectProxies.has(target))

@@ -36,9 +36,19 @@ export const set = Reflect.set
 export const get = Reflect.get
 export const has = Reflect.has
 
-export const createElement = document.createElement.bind(document)
+/**
+ * @type {Document['createElement']}
+ * @param {string} tagName
+ */
+export const createElement = (tagName) => document.createElement(tagName)
 /**@param {*} string */
 export const toLowerCase = (string) => string?.toLowerCase?.()
 
 /**@type {<T>(instance: unknown, Class: new () => T) => instance is T} */
 export const instanceOf = (instance, Class) => instance instanceof Class
+
+/**@type {(value:any)=>value is string}  */
+export const isString = (value) => typeof value == 'string'
+
+/**@type {(value:any)=>value is object}  */
+export const isObject = (value) => typeof value == 'object' && value

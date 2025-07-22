@@ -2,6 +2,8 @@ import {
   createElement,
   defineProperty,
   instanceOf,
+  isObject,
+  isString,
   set,
   toLowerCase,
 } from './globals.js'
@@ -29,7 +31,7 @@ export function patch(parent, oldNode, newNode) {
   // *element
   if (instanceOf(oldNode, Element)) {
     // customElement vs CustomElement
-    if (typeof newNode != 'object' || !newNode) return
+    if (!isObject(newNode)) return
 
     // *props
     patchProps(oldNode, newNode)
@@ -68,7 +70,7 @@ export function patchProps(oldNode, newNode) {
 
     // class
     if (key === 'class' && newValue) {
-      if (typeof newValue === 'string') {
+      if (isString(newValue)) {
         oldNode.className = newValue
         continue
       }
@@ -87,7 +89,7 @@ export function patchProps(oldNode, newNode) {
       newValue &&
       (instanceOf(oldNode, HTMLElement) || instanceOf(oldNode, SVGElement))
     ) {
-      if (typeof newValue === 'string') {
+      if (isString(newValue)) {
         oldNode.style = newValue
         continue
       }
@@ -241,7 +243,7 @@ export function createNode(object) {
   }
 
   // text
-  if (typeof object !== 'object' || !object) {
+  if (!isObject(object)) {
     return new Text(String(object ?? ''))
   }
 
@@ -265,7 +267,7 @@ export function isSameNode(oldNode, newNode) {
   if (oldNode.constructor == newNode) return true
 
   // *text
-  if (!newNode || typeof newNode != 'object') {
+  if (!isObject(newNode)) {
     return instanceOf(oldNode, Text)
   }
 
