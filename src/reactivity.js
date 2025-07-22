@@ -5,6 +5,7 @@ import {
   get,
   has,
   instanceOf,
+  isObject,
   set,
 } from './globals.js'
 
@@ -26,8 +27,7 @@ let activeEffect
  * @returns {T}
  */
 function reactive(target) {
-  if (!target) return target
-  if (!instanceOf(target, Object)) return target
+  if (!isObject(target)) return target
   if (isReactive(target)) return target
   if (objectProxies.has(target))
     return /** @type {T} */ (objectProxies.get(target))

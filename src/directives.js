@@ -1,10 +1,13 @@
+import { isFunction } from './globals.js'
+
 /**
  * @param {*} bool
  * @param {VChildren} children
  * @param {VChildren} elseChildren
  */
 export function $if(bool, children, elseChildren) {
-  if (bool) return typeof children == 'function' ? children() : children
+  if (bool) return isFunction(children) ? children() : children
+
   return typeof elseChildren == 'function' ? elseChildren() : elseChildren
 }
 

@@ -2,6 +2,9 @@ import {
   createElement,
   defineProperty,
   instanceOf,
+  isFunction,
+  isObject,
+  isString,
   set,
   toLowerCase,
 } from './globals.js'
@@ -16,7 +19,7 @@ import {
  */
 export function patch(parent, oldNode, newNode) {
   // function
-  if (instanceOf(newNode, Function)) {
+  if (isFunction(newNode)) {
     newNode = newNode()
   }
 
@@ -29,7 +32,7 @@ export function patch(parent, oldNode, newNode) {
   // *element
   if (instanceOf(oldNode, Element)) {
     // customElement vs CustomElement
-    if (typeof newNode != 'object' || !newNode) return
+    if (!isObject(newNode)) return
 
     // *props
     patchProps(oldNode, newNode)
@@ -68,7 +71,7 @@ export function patchProps(oldNode, newNode) {
 
     // class
     if (key === 'class' && newValue) {
-      if (typeof newValue === 'string') {
+      if (isString(newValue)) {
         oldNode.className = newValue
         continue
       }
@@ -87,7 +90,7 @@ export function patchProps(oldNode, newNode) {
       newValue &&
       (instanceOf(oldNode, HTMLElement) || instanceOf(oldNode, SVGElement))
     ) {
-      if (typeof newValue === 'string') {
+      if (isString(newValue)) {
         oldNode.style = newValue
         continue
       }
@@ -146,11 +149,11 @@ export function patchChildren(oldNode, newNode) {
   const oldChildNodes = [...oldNode.childNodes]
   let newChildNodes = newNode.children ?? newNode.childNodes
 
-  if (instanceOf(newChildNodes, Function)) {
+  if (isFunction(newChildNodes)) {
     newChildNodes = newChildNodes()
   }
 
-  if (newChildNodes?.[Symbol.iterator] && typeof newChildNodes != 'string') {
+  if (newChildNodes?.[Symbol.iterator] && !isString(newChildNodes)) {
     // flat: `a ${[1, 2, 3]} b` => ['a', [1, 2, 3], 'b'] => ['a', 1, 2, 3, 'b']
     newChildNodes = [...newChildNodes].flat()
   } else {
@@ -241,7 +244,7 @@ export function createNode(object) {
   }
 
   // text
-  if (typeof object !== 'object' || !object) {
+  if (!isObject(object)) {
     return new Text(String(object ?? ''))
   }
 
@@ -265,7 +268,7 @@ export function isSameNode(oldNode, newNode) {
   if (oldNode.constructor == newNode) return true
 
   // *text
-  if (!newNode || typeof newNode != 'object') {
+  if (!isObject(newNode)) {
     return instanceOf(oldNode, Text)
   }
 
@@ -273,7 +276,9 @@ export function isSameNode(oldNode, newNode) {
   // @ts-ignore
   const tagName = newNode?.is || newNode?.tagName
   if (tagName) {
+    // tagName: CustomElement
     if (instanceOf(tagName, Function) && instanceOf(oldNode, tagName)) {
+      oldNode
       return true
     }
     return toLowerCase(oldNode.nodeName) == toLowerCase(tagName)

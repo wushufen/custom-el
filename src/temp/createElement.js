@@ -1,4 +1,11 @@
-import { createElement, defineProperty, instanceOf } from '../globals.js'
+import {
+  createElement,
+  defineProperty,
+  instanceOf,
+  isArray,
+  isFunction,
+  isString,
+} from '../globals.js'
 
 /**
  * @param {Tag} tag
@@ -9,7 +16,7 @@ import { createElement, defineProperty, instanceOf } from '../globals.js'
 export function h(tag = '', props = {}, children = []) {
   children = props.children ?? children
   delete props.children
-  if (!instanceOf(children, Array)) children = [children]
+  if (!isArray(children)) children = [children]
   children = children.flat()
 
   /**@type {Element&{[propsKey]?:Props}} */
@@ -17,7 +24,7 @@ export function h(tag = '', props = {}, children = []) {
   // tag
   {
     // 'tagName'
-    if (typeof tag === 'string') {
+    if (isString(tag)) {
       el = createElement(tag)
     }
     // HTMLElement
@@ -49,7 +56,7 @@ export function h(tag = '', props = {}, children = []) {
     }
 
     // ${()=>{}}
-    if (instanceOf(child, Function)) {
+    if (isFunction(child)) {
       // for.of
       const list = props['for.of']
       if (list) {
